@@ -88,29 +88,39 @@ public class Main {
                 return;
             }
 
-            //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            String urlHost = String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost());
+            Collection<CategoryItem> items = new CategoryIndexParser(jPage, urlHost).parse();
 
-            System.out.println(jPage);
+            ensureSpentTime(tStart, 300);
+
+            synchronized (categoryItems) {
+                categoryItems.addAll(items);
+                categoryItems.notifyAll();
+            }
 
 
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
 
-            int dt = (int)(System.currentTimeMillis() - tStart);
-            if (dt < 300) {
-                try {
-                    Thread.sleep(300 - dt);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            }
+            ensureSpentTime(tStart, 300);
             synchronized (categoryItems) {
                 categoryItems.notifyAll();
             }
         }
 
+    }
+
+    private void ensureSpentTime(long tStart, int needSpend) {
+        int dt = (int)(System.currentTimeMillis() - tStart);
+        if (dt < needSpend) {
+            try {
+                Thread.sleep(needSpend - dt);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 
 }
