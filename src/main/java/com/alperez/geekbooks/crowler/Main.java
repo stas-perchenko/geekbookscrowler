@@ -9,9 +9,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -42,13 +43,13 @@ public class Main {
     private final URL urlStartPage;
     private final ExecutorService exec;
 
-    private final Collection<CategoryItem> categoryItems = new ArrayList<>(100);
+    private final Deque<CategoryItem> categoryItems = new LinkedList<>();
 
 
 
     public void start() {
         exec.execute(this::parseStartPageForCategories);
-        for (int i=0; i<(nThreads-1); i++) {
+        for (int i=0; i<(nThreads - 0); i++) {
             exec.execute(new CategoryProcessor(categoryItems));
         }
     }

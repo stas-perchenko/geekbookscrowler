@@ -30,7 +30,7 @@ public class CategoryItem {
         return url;
     }
 
-    public int getnBooks() {
+    public int getNBooks() {
         return nBooks;
     }
 
