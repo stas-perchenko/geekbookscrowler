@@ -1,0 +1,2 @@
+https://github.com/nahi/siphash-java-inline/blob/master/src/main/java/org/jruby/util/SipHashInline.java
+https://github.com/emboss/siphash-java/blob/master/src/main/java/com/github/emboss/siphash/SipKey.java
