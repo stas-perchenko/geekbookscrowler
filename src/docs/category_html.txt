@@ -1,0 +1,82 @@
+<table class="book-list">
+	<thead>
+		<tr>
+			<th class="cover">Cover</th>
+			<th class="title sort" data-field="title">Title<span class="sort-icon"></span>
+			</th>
+			<th class="year sort active desc" data-field="year">Year<span class="sort-icon"></span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td class="cover">
+				<a href="/book/view/build-ios-database-apps-with-swift-and-sqlite"><img alt="" src="/cover/b4/a7/aee13df48d3a7215608eec8d8814/build_ios_database_apps_with_swift_and_sqlite_s.jpg" width="100" height="143"/></a>
+			</td>
+			<td class="title">
+				<div>
+					<a class="title" href="/book/view/build-ios-database-apps-with-swift-and-sqlite">Build iOS Database Apps with Swift and SQLite</a>
+				</div>
+				<div class="authors">by <a href="/search?q=Kevin+Languedoc">Kevin Languedoc</a>
+				</div>
+				<div class="description">This book leads you through the essential concepts and neReaders will learn about SQL operations like selecting, inserting,
+					<span class="more-visible"><a class="more-link" href="#">more aquo;</a>
+					</span>
+					<span class="more-hidden"> updating and deleting data using various data types like text, numerical types, and developers. <a class="less-link" href="#">aquo; less</a>
+					</span>
+				</div>
+				<div class="tags"> 
+					<a class="tag" href="/tag/view/apple">Apple</a>
+					<a class="tag" href="/tag/view/db">Databases</a>
+					<a class="tag" href="/tag/view/ios">iOS</a>
+					<a class="tag" href="/tag/view/ipad">iPad</a>
+					<a class="tag" href="/tag/view/iphone">iPhone</a>
+					<a class="tag" href="/tag/view/mobile">Mobile</a>
+					<a class="tag" href="/tag/view/objc">Objective-C</a>
+					<a class="tag" href="/tag/view/sql">SQL</a>
+					<a class="tag" href="/tag/view/sqlite">SQLite</a>
+					<a class="tag" href="/tag/view/swift">Swift</a>
+				</div>
+			</td>
+			<td class="year">2016</td>
+		</tr>
+		
+		<tr>
+			<td class="cover">
+				<a href="/book/view/learning-sqlite-for-ios"><img alt="" src="/cover/40/df/d4fe2cce1e66014f5b4ec903526f/learning_sqlite_for_ios_s.jpg" width="100" height="129"/></a>
+			</td>
+			<td class="title">
+				<div>
+					<a class="title" href="/book/view/learning-sqlite-for-ios">Learning SQLite for iOS</a>
+				</div>
+				<div class="subtitle">Extend SQLite with mobile development skills to build  great apps for iOS devices</div>
+				<div class="authors">by <a href="/search?q=Gene+Da+Rocha">Gene Da Rocha</a>, <a href="/search?q=MSc">MSc</a>, <a href="/search?q=BSc+(Hons)">BSc (Hons)</a>
+				</div>
+				<div class="description">KEY FEATURESBOOK DESCRIPTIOThe<span class="more-visible"> 
+						<a class="more-link" href="#">more aquo;</a>
+					</span>
+					<span class="more-hidden"> ability to use SQLite with iOS provides a great opportunity to build amazing apps. Apple's iOS SDK provides native support for SQLite databases. This combination oster it, and maintain it. Further, you will learn how to operate your SQLite databases smoothly using SQL commands.rn app which can benefit from all these technologies - all through creating a complete, customizable application skeleton that you can build on for your own apps.mes from a programming and development background, and has worked with database technology, iOS, Android, Windows mobile, and a variety of other technologies.ly testing software for a number of companies such as DigitasLBI, Oxfam, News UK, QAWorks, Reuters, and the Association for Project Management, among many others.e Features and Advances in SQLite <a class="less-link" href="#">aquo; less</a>
+					</span>
+				</div>
+				<div class="tags">
+					<a class="tag" href="/tag/view/api">API</a>
+					<a class="tag" href="/tag/view/apple">Apple</a>
+					<a class="tag" href="/tag/view/database">Database</a>
+					<a class="tag" href="/tag/view/db">Databases</a>
+					<a class="tag" href="/tag/view/ios">iOS</a>
+					<a class="tag" href="/tag/view/mobile">Mobile</a>
+					<a class="tag" href="/tag/view/phonegap">PhoneGap</a>
+					<a class="tag" href="/tag/view/sql">SQL</a>
+					<a class="tag" href="/tag/view/sqlite">SQLite</a>
+					<a class="tag" href="/tag/view/swift">Swift</a>
+					<a class="tag" href="/tag/view/xcode">Xcode</a>
+				</div>
+			</td>
+			<td class="year">2016</td>
+		</tr>
+		
+		<tr>
+			<td class="cover"><a href="/book/view/the-definitive-guide-to-sqlite"><img alt="" src="/cover/c0/c6/bfe22a67b7cedbb5732c81a65ebc/the_definitive_guide_to_sqlite_s.jpg" width="100" height="132"/></a></td><td class="title"><div><a class="title" href="/book/view/the-definitive-guide-to-sqlite">The Definitive Guide to SQLite</a></div><div class="authors">by <a href="/search?q=Mike+Owens">Mike Owens</a></div><div class="description">Traditional relational databases and embedded databases both have shortcomings that can leave a developer perplexed. So for many people, the solution resides in an open source embeddable database with an amazingly small footprint (less than 250 kilobytes). SQLite packs a powerful array of features and<span class="more-visible"> <a class="more-link" href="#">more aquo;</a></span><span class="more-hidden"> can handle databases as large as 2 terabytes. It offers a flexible set of datatypes and the ability to perform transactions, and it is supported by languages like C, PHP, Perl, and Python. And because SQLite's databases are completely file based, privileges are granted at the operating system level, allowing for easy and fast user management. <a class="less-link" href="#">aquo; less</a></span></div><div class="tags"> <a class="tag" href="/tag/view/sqlite">SQLite</a></div></td><td class="year">2006</td>
+		</tr>
+	</tbody>
+</table>

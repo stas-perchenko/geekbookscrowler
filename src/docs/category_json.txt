@@ -1,0 +1,337 @@
+{
+	"table": {
+		"-class": "book-list",
+		"thead": {
+			"tr": {
+				"th": [{
+					"-class": "cover",
+					"#text": "Cover"
+				},
+				{
+					"-class": "title sort",
+					"-data-field": "title",
+					"#text": "Title",
+					"span": {
+						"-class": "sort-icon"
+					}
+				},
+				{
+					"-class": "year sort active desc",
+					"-data-field": "year",
+					"#text": "Year",
+					"span": {
+						"-class": "sort-icon"
+					}
+				}]
+			}
+		},
+		"tbody": {
+			"tr": [{
+				"td": [{
+					"-class": "cover",
+					"a": {
+						"-href": "/book/view/build-ios-database-apps-with-swift-and-sqlite",
+						"img": {
+							"-src": "/cover/b4/a7/aee13df48d3a7215608eec8d8814/build_ios_database_apps_with_swift_and_sqlite_s.jpg",
+							"-width": "100",
+							"-height": "143"
+						}
+					}
+				},
+				{
+					"-class": "title",
+					"div": [{
+						"a": {
+							"-class": "title",
+							"-href": "/book/view/build-ios-database-apps-with-swift-and-sqlite",
+							"#text": "Build iOS Database Apps with Swift and SQLite"
+						}
+					},
+					{
+						"-class": "authors",
+						"#text": "by ",
+						"a": {
+							"-href": "/search?q=Kevin+Languedoc",
+							"#text": "Kevin Languedoc"
+						}
+					},
+					{
+						"-class": "description",
+						"#text": "This book leads you through the essential concepts and neReaders will learn about SQL operations like selecting, inserting",
+						"span": [{
+							"-class": "more-visible",
+							"a": {
+								"-class": "more-link",
+								"-href": "#",
+								"#text": "more aquo;"
+							}
+						},
+						{
+							"-class": "more-hidden",
+							"#text": " updating and deleting data using various data types like text, numerical types, and developers. ",
+							"a": {
+								"-class": "less-link",
+								"-href": "#",
+								"#text": "aquo; less"
+							}
+						}]
+					},
+					{
+						"-class": "tags",
+						"a": [{
+							"-class": "tag",
+							"-href": "/tag/view/apple",
+							"#text": "Apple"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/db",
+							"#text": "Databases"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/ios",
+							"#text": "iOS"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/ipad",
+							"#text": "iPad"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/iphone",
+							"#text": "iPhone"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/mobile",
+							"#text": "Mobile"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/objc",
+							"#text": "Objective-C"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/sql",
+							"#text": "SQL"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/sqlite",
+							"#text": "SQLite"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/swift",
+							"#text": "Swift"
+						}]
+					}]
+				},
+				{
+					"-class": "year",
+					"#text": "2016"
+				}]
+			},
+			
+			
+			
+			
+			
+			{
+				"td": [{
+					"-class": "cover",
+					"a": {
+						"-href": "/book/view/learning-sqlite-for-ios",
+						"img": {
+							"-src": "/cover/40/df/d4fe2cce1e66014f5b4ec903526f/learning_sqlite_for_ios_s.jpg",
+							"-width": "100",
+							"-height": "129"
+						}
+					}
+				},
+				{
+					"-class": "title",
+					"div": [{
+						"a": {
+							"-class": "title",
+							"-href": "/book/view/learning-sqlite-for-ios",
+							"#text": "Learning SQLite for iOS"
+						}
+					},
+					{
+						"-class": "subtitle",
+						"#text": "Extend SQLite with mobile development skills to build  great apps for iOS devices"
+					},
+					{
+						"-class": "authors",
+						"#text": ["by ",
+						", ",
+						", "],
+						"a": [{
+							"-href": "/search?q=Gene+Da+Rocha",
+							"#text": "Gene Da Rocha"
+						},
+						{
+							"-href": "/search?q=MSc",
+							"#text": "MSc"
+						},
+						{
+							"-href": "/search?q=BSc+(Hons)",
+							"#text": "BSc (Hons)"
+						}]
+					},
+					{
+						"-class": "description",
+						"#text": "KEY FEATURESBOOK DESCRIPTIOThe",
+						"span": [{
+							"-class": "more-visible",
+							"a": {
+								"-class": "more-link",
+								"-href": "#",
+								"#text": "more aquo;"
+							}
+						},
+						{
+							"-class": "more-hidden",
+							"#text": " ability to use SQLite with iOS provides a great opportunity to build amazing apps. Apple's iOS SDK provides native support for SQLite databases. This combination oster it, and maintain it. Further, you will learn how to operate your SQLite databases smoothly using SQL commands.rn app which can benefit from all these technologies - all through creating a complete, customizable application skeleton that you can build on for your own apps.mes from a programming and development background, and has worked with database technology, iOS, Android, Windows mobile, and a variety of other technologies.ly testing software for a number of companies such as DigitasLBI, Oxfam, News UK, QAWorks, Reuters, and the Association for Project Management, among many others.e Features and Advances in SQLite ",
+							"a": {
+								"-class": "less-link",
+								"-href": "#",
+								"#text": "aquo; less"
+							}
+						}]
+					},
+					{
+						"-class": "tags",
+						"a": [{
+							"-class": "tag",
+							"-href": "/tag/view/api",
+							"#text": "API"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/apple",
+							"#text": "Apple"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/database",
+							"#text": "Database"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/db",
+							"#text": "Databases"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/ios",
+							"#text": "iOS"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/mobile",
+							"#text": "Mobile"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/phonegap",
+							"#text": "PhoneGap"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/sql",
+							"#text": "SQL"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/sqlite",
+							"#text": "SQLite"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/swift",
+							"#text": "Swift"
+						},
+						{
+							"-class": "tag",
+							"-href": "/tag/view/xcode",
+							"#text": "Xcode"
+						}]
+					}]
+				},
+				{
+					"-class": "year",
+					"#text": "2016"
+				}]
+			},
+			{
+				"td": [{
+					"-class": "cover",
+					"a": {
+						"-href": "/book/view/the-definitive-guide-to-sqlite",
+						"img": {
+							"-src": "/cover/c0/c6/bfe22a67b7cedbb5732c81a65ebc/the_definitive_guide_to_sqlite_s.jpg",
+							"-width": "100",
+							"-height": "132"
+						}
+					}
+				},
+				{
+					"-class": "title",
+					"div": [{
+						"a": {
+							"-class": "title",
+							"-href": "/book/view/the-definitive-guide-to-sqlite",
+							"#text": "The Definitive Guide to SQLite"
+						}
+					},
+					{
+						"-class": "authors",
+						"#text": "by ",
+						"a": {
+							"-href": "/search?q=Mike+Owens",
+							"#text": "Mike Owens"
+						}
+					},
+					{
+						"-class": "description",
+						"#text": "Traditional relational databases and embedded databases both have shortcomings that can leave a developer perplexed. So for many people, the solution resides in an open source embeddable database with an amazingly small footprint (less than 250 kilobytes). SQLite packs a powerful array of features and",
+						"span": [{
+							"-class": "more-visible",
+							"a": {
+								"-class": "more-link",
+								"-href": "#",
+								"#text": "more aquo;"
+							}
+						},
+						{
+							"-class": "more-hidden",
+							"#text": " can handle databases as large as 2 terabytes. It offers a flexible set of datatypes and the ability to perform transactions, and it is supported by languages like C, PHP, Perl, and Python. And because SQLite's databases are completely file based, privileges are granted at the operating system level, allowing for easy and fast user management. ",
+							"a": {
+								"-class": "less-link",
+								"-href": "#",
+								"#text": "aquo; less"
+							}
+						}]
+					},
+					{
+						"-class": "tags",
+						"a": {
+							"-class": "tag",
+							"-href": "/tag/view/sqlite",
+							"#text": "SQLite"
+						}
+					}]
+				},
+				{
+					"-class": "year",
+					"#text": "2006"
+				}]
+			}]
+		}
+	}
+}
