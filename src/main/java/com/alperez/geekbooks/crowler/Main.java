@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +22,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-
+            Log.d(Thread.currentThread().getName(), "main() was started: %s", Arrays.toString(args));
             Main main = new Main(new URL(args[0]), (args.length > 1) ? Integer.parseInt(args[1]) : 1);
             main.start();
             main.join();
@@ -29,6 +30,7 @@ public class Main {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        Log.d(Thread.currentThread().getName(), "main() has been finished");
     }
 
     public Main(URL urlStartPage, int nThreads) throws MalformedURLException {
@@ -46,13 +48,14 @@ public class Main {
 
     public void start() {
         exec.execute(this::parseStartPageForCategories);
-        for (int i=0; i<nThreads; i++) {
+        for (int i=0; i<(nThreads-1); i++) {
             exec.execute(new CategoryProcessor(categoryItems));
         }
     }
 
     public void join() throws InterruptedException {
-        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        exec.shutdown();
+        exec.awaitTermination(25, TimeUnit.SECONDS);
     }
 
 
