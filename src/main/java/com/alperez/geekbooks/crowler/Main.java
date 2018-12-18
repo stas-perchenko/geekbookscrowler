@@ -9,10 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +24,13 @@ public class Main {
             Main main = new Main(new URL(args[0]), (args.length > 1) ? Integer.parseInt(args[1]) : 1);
             main.start();
             main.join();
+
+            // The set of BookRefItem is filled in here
+
+            //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            main.printAllFoundBookReferences();
+
+
         } catch (MalformedURLException | InterruptedException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -36,27 +40,39 @@ public class Main {
 
     public Main(URL urlStartPage, int nThreads) throws MalformedURLException {
         this.urlStartPage = urlStartPage;
+        this.urlHost = new URL(String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost()));
         exec = Executors.newFixedThreadPool(this.nThreads = nThreads);
     }
 
     private final int nThreads;
     private final URL urlStartPage;
+    private final URL urlHost;
     private final ExecutorService exec;
 
     private final Deque<CategoryItem> categoryItems = new LinkedList<>();
+    private final Set<BookRefItem> foundBookRefs = new HashSet<>();
 
-
+    public void printAllFoundBookReferences() {
+        System.out.println(String.format("\n\n===================  Found totally %d book references  ==================", foundBookRefs.size()));
+        for (BookRefItem ref : foundBookRefs) {
+            System.out.println("\t"+ref+";");
+        }
+    }
 
     public void start() {
         exec.execute(this::parseStartPageForCategories);
         for (int i=0; i<(nThreads - 0); i++) {
-            exec.execute(new CategoryProcessor(categoryItems));
+            exec.execute(new CategoryProcessor(categoryItems, urlHost, (refs) -> {
+                synchronized (foundBookRefs) {
+                    foundBookRefs.addAll(refs);
+                }
+            }));
         }
     }
 
     public void join() throws InterruptedException {
         exec.shutdown();
-        exec.awaitTermination(25, TimeUnit.SECONDS);
+        exec.awaitTermination(45, TimeUnit.MINUTES);
     }
 
 
@@ -92,8 +108,7 @@ public class Main {
                 return;
             }
 
-            String urlHost = String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost());
-            Collection<CategoryItem> items = new CategoryIndexParser(jPage, urlHost).parse();
+            Collection<CategoryItem> items = new CategoryIndexParser(jPage, urlHost.toString()).parse();
 
             ensureSpentTime(tStart, 300);
 
@@ -112,7 +127,6 @@ public class Main {
                 categoryItems.notifyAll();
             }
         }
-
     }
 
     private void ensureSpentTime(long tStart, int needSpend) {

@@ -27,9 +27,9 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <outputDirectory>${basedir}</outputDirectory>
+                    <outputDirectory>${basedir}/target/jar</outputDirectory>
                     <finalName>geekbooks-crowler</finalName>
-                    <appendAssemblyId>true</appendAssemblyId>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
                             <mainClass>com.alperez.geekbooks.crowler.Main</mainClass>

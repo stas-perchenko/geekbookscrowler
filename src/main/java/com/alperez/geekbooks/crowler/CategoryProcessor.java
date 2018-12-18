@@ -8,23 +8,29 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CategoryProcessor implements Runnable {
-    public static final String BOOKS_PAGE_CONTENT_TAG = "<div class=\"clearfix content category view\">";
-
-
+    public static final String BOOKS_PAGE_CONTENT_TAG = "<table class=\"book-list\">";
     private static final AtomicInteger static_inst_cntr = new AtomicInteger(0);
 
+    public interface Callback {
+        void onBookFound(Collection<BookRefItem> refItems);
+    }
 
     private final int nInstance;
     private final Deque<CategoryItem> itemsQueue;
+    private final URL urlHost;
+    private final Callback callback;
 
     private final String TAG;
 
-    public CategoryProcessor(Deque<CategoryItem> itemsQueue) {
+    public CategoryProcessor(Deque<CategoryItem> itemsQueue, URL urlHost, Callback cb) {
         this.itemsQueue = itemsQueue;
+        this.urlHost = urlHost;
+        this.callback = cb;
         nInstance = static_inst_cntr.incrementAndGet();
         TAG = String.format("%s-%d", getClass().getSimpleName(), nInstance);
     }
@@ -75,11 +81,20 @@ public class CategoryProcessor implements Runnable {
             Log.d("\n"+TAG, String.format("---> Start loading books page %d for %s - %s", nPage, runItem.getTitle(), pageUrl));
             String pageHtml = new HtmlPageLoader(pageUrl).load(1000000);
             Log.d(TAG, String.format("<--- Books page %d has been loaded. Size=%d", nPage, pageHtml.length()));
+
             int pgBooks = decodeBooksPage(pageHtml);
+            Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pgBooks, runItem.getTitle(), nPage));
+
             nBooksFound += pgBooks;
         } while ((nBooksFound < runItem.getNBooks()) & (nPage++ < 80));
     }
 
+    /**
+     *
+     * @param html content of the list of books
+     * @return number of found book references
+     * @throws IOException
+     */
     private int decodeBooksPage(String html) throws IOException {
         int index = html.indexOf(BOOKS_PAGE_CONTENT_TAG);
         if (index < 0) {
@@ -88,7 +103,7 @@ public class CategoryProcessor implements Runnable {
             //return;
         }
 
-        String content = new TagExtractor(html).getTag("div", index);
+        String content = new TagExtractor(html).getTag("table", index);
         if (content == null) {
             throw new IOException(String.format("Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG));
             //Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG);
@@ -99,13 +114,17 @@ public class CategoryProcessor implements Runnable {
 
         JSONObject jPage = null;
         try {
-            jPage = org.json.XML.toJSONObject(content, true);
+            jPage = org.json.XML.toJSONObject(content, false);
             Log.d(TAG, "<--- HTML content was successfully converted to JSON - "+jPage);
         } catch (JSONException e) {
             throw new IOException("cannot convert HTML content to JSON - "+e.getMessage(), e);
         }
 
-        //TODO Implement further
-        return 10;
+        Collection<BookRefItem> foundRefs = new BookListPageParcer(jPage, urlHost.toString()).parse();
+        if (!foundRefs.isEmpty()) {
+            callback.onBookFound(foundRefs);
+        }
+
+        return foundRefs.size();
     }
 }
