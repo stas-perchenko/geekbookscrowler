@@ -1,4 +1,4 @@
-package com.alperez.geekbooks.crowler;
+package com.alperez.geekbooks.crowler.data;
 
 import java.net.URL;
 

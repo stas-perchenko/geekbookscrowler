@@ -1,5 +1,6 @@
-package com.alperez.geekbooks.crowler;
+package com.alperez.geekbooks.crowler.parser;
 
+import com.alperez.geekbooks.crowler.data.BookRefItem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

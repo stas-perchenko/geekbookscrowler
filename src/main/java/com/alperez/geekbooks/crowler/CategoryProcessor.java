@@ -1,5 +1,8 @@
 package com.alperez.geekbooks.crowler;
 
+import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.data.CategoryItem;
+import com.alperez.geekbooks.crowler.parser.BookListPageParcer;
 import com.alperez.geekbooks.crowler.utils.HtmlPageLoader;
 import com.alperez.geekbooks.crowler.utils.Log;
 import com.alperez.geekbooks.crowler.utils.TagExtractor;
