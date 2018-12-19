@@ -1,0 +1,14 @@
+---- BookModel ----
+
+id (generated field):	long
+image:	URL
+pdfUrl:	URL
+pdfSize:	float
+title:	String
+subtitle: String
+authors: Author[]
+year:	int
+nPages:	int
+description: String
+tags:	Tag[]
+category: Category (end-point of tree)
