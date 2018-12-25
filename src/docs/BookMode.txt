@@ -1,6 +1,7 @@
 ---- BookModel ----
 
 id (generated field):	long
+geekbooksAddress: URL
 image:	URL
 pdfUrl:	URL
 pdfSize:	float
