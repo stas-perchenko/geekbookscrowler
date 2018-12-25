@@ -2,9 +2,9 @@ package com.alperez.geekbooks.crowler.data;
 
 import com.google.auto.value.AutoValue;
 
+
 @AutoValue
 public abstract class TagModel {
-
     public abstract long id();
     public abstract String title();
 
