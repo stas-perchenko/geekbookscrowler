@@ -35,5 +35,21 @@ public class TextUtils {
     }
 
 
+    public static boolean checkISBN(CharSequence cs) {
+        if (isNotEmpty(cs)) {
+            String s = ((cs instanceof String) ? (String) cs : cs.toString()).replaceAll("-", "");
+            try {
+                Long.parseLong(s);
+                return s.length() == 13;
+            } catch (NumberFormatException e){}
+        }
+        return false;
+    }
+
+    public static boolean checkAsin(CharSequence cs) {
+        return (cs != null) && (cs.length() == 10);
+    }
+
+
     private TextUtils() { }
 }

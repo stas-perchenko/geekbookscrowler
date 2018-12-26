@@ -39,7 +39,7 @@ public abstract class BookModel {
 
     private String getIdHashText() {
         if (TextUtils.isNotEmpty(isbn())) {
-            return String.format("%s:%d", isbn(), year().intValue());
+            return String.format("%s:%d", isbn().replaceAll("-", ""), year().intValue());
         } else {
             StringBuilder sb = new StringBuilder(year().toString());
             sb.append(':');
@@ -48,7 +48,7 @@ public abstract class BookModel {
                 sb.append(':');
                 sb.append(author.fullName());
             }
-            return sb.toString().replace(' ', '_');
+            return sb.toString().replaceAll(" ", "_");
         }
     }
 
