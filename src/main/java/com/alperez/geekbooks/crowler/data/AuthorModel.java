@@ -1,6 +1,7 @@
 package com.alperez.geekbooks.crowler.data;
 
 import com.alperez.geekbooks.crowler.utils.Nullable;
+import com.alperez.geekbooks.crowler.utils.TextUtils;
 import com.alperez.siphash.SipHash;
 import com.alperez.siphash.SipHashKey;
 import com.google.auto.value.AutoValue;
@@ -12,6 +13,10 @@ public abstract class AuthorModel {
     @Nullable
     public abstract String name();
     public abstract String familyName();
+
+    public String fullName() {
+        return TextUtils.isEmpty(name()) ? familyName() : String.format("%s %s", name(), familyName());
+    }
 
     private long id;
 
