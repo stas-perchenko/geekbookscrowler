@@ -1,5 +1,6 @@
 package com.alperez.geekbooks.crowler;
 
+import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
 import com.alperez.geekbooks.crowler.data.CategoryItem;
 import com.alperez.geekbooks.crowler.parser.CategoryIndexParser;
@@ -30,8 +31,17 @@ public class Main {
 
             // The set of BookRefItem is filled in here
 
-            //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             main.printAllFoundBookReferences();
+
+
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(main.foundBookRefs, main.nThreads);
+            booksDecoder.start();
+            booksDecoder.join();
+            Collection<BookModel> books = booksDecoder.getDecodedBooks();
+
+            //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
         } catch (MalformedURLException | InterruptedException e) {
@@ -41,11 +51,7 @@ public class Main {
         Log.d(Thread.currentThread().getName(), "main() has been finished");
     }
 
-    public Main(URL urlStartPage, int nThreads) throws MalformedURLException {
-        this.urlStartPage = urlStartPage;
-        this.urlHost = new URL(String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost()));
-        exec = Executors.newFixedThreadPool(this.nThreads = nThreads);
-    }
+
 
     private final int nThreads;
     private final URL urlStartPage;
@@ -54,6 +60,13 @@ public class Main {
 
     private final Deque<CategoryItem> categoryItems = new LinkedList<>();
     private final Set<BookRefItem> foundBookRefs = new HashSet<>();
+
+
+    public Main(URL urlStartPage, int nThreads) throws MalformedURLException {
+        this.urlStartPage = urlStartPage;
+        this.urlHost = new URL(String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost()));
+        exec = Executors.newFixedThreadPool(this.nThreads = nThreads);
+    }
 
     public void printAllFoundBookReferences() {
         System.out.println(String.format("\n\n===================  Found totally %d book references  ==================", foundBookRefs.size()));
@@ -76,6 +89,7 @@ public class Main {
     public void join() throws InterruptedException {
         exec.shutdown();
         exec.awaitTermination(45, TimeUnit.MINUTES);
+        if (!exec.isTerminated()) throw new InterruptedException("timeout");
     }
 
 
