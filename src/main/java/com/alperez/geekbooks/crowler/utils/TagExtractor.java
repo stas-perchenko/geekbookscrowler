@@ -9,6 +9,7 @@ public class TagExtractor {
         this.htmlChars = html.toCharArray();
     }
 
+    @Nullable
     public String getTag(String tagName, final int startIndex) {
         final char[] startTag = ("<"+tagName).toCharArray();
         final char[] endTag = String.format("</%s>", tagName).toCharArray();

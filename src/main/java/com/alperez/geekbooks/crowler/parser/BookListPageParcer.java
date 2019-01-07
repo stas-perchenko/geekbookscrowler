@@ -61,7 +61,12 @@ public class BookListPageParcer {
                             String bookTitle = jRef.getString("content");
                             String bookPath  = jRef.getString("href");
                             try {
-                                BookRefItem refModel = new BookRefItem(bookTitle, new URL(String.format("%s://%s", urlHost.toString(), bookPath)));
+
+                                String link = (urlHost.endsWith("/") || bookPath.startsWith("/"))
+                                        ? (urlHost + bookPath)
+                                        : String.format("%s/%s", urlHost, bookPath);
+
+                                BookRefItem refModel = new BookRefItem(bookTitle, new URL(link));
                                 dst.add(refModel);
                                 //TODO Log this
                             } catch (MalformedURLException e) {

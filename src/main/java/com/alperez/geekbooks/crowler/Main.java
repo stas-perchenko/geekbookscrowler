@@ -35,7 +35,7 @@ public class Main {
             main.printAllFoundBookReferences();
 
 
-            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(main.foundBookRefs, main.nThreads);
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(main.foundBookRefs, 1);
             booksDecoder.start();
             booksDecoder.join();
             Collection<BookModel> books = booksDecoder.getDecodedBooks();
