@@ -2,7 +2,9 @@ package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.utils.NonNull;
 
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,14 +13,16 @@ import java.util.concurrent.TimeUnit;
 public class BooksLoaderAndDecoder {
 
 
+    private final URL urlHost;
     private final ExecutorService exec;
-    final int nThreads;
+    private final int nThreads;
     private boolean isStarted;
     final Iterator<BookRefItem> src;
 
     private final List<BookModel> result = new LinkedList<>();
 
-    public BooksLoaderAndDecoder(Collection<BookRefItem> bookRefs, int nThreads) {
+    public BooksLoaderAndDecoder(@NonNull URL urlHost, Collection<BookRefItem> bookRefs, int nThreads) {
+        this.urlHost = urlHost;
         exec = Executors.newFixedThreadPool(this.nThreads = nThreads);
         this.src = bookRefs.iterator();
     }
@@ -33,12 +37,12 @@ public class BooksLoaderAndDecoder {
         }
 
         for (int i=0; i<nThreads; i++) {
-            exec.execute(new BookItemProcessor(() -> {
+            exec.execute(new BookItemProcessor(urlHost, () -> {
                         synchronized (src) {
                             return src.hasNext() ? src.next() : null;
                         }
                     },
-                    book -> addDecodedBook(book)
+                    (book, relatedBooks) -> addDecodedBook(book) //TODO Handle related books !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             ));
         }
 

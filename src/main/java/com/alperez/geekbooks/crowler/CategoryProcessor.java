@@ -5,7 +5,7 @@ import com.alperez.geekbooks.crowler.data.CategoryItem;
 import com.alperez.geekbooks.crowler.parser.BookListPageParcer;
 import com.alperez.geekbooks.crowler.utils.HtmlPageLoader;
 import com.alperez.geekbooks.crowler.utils.Log;
-import com.alperez.geekbooks.crowler.utils.TagExtractor;
+import com.alperez.geekbooks.crowler.utils.XmlTagExtractor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -106,7 +106,7 @@ public class CategoryProcessor implements Runnable {
             //return;
         }
 
-        String content = new TagExtractor(html).getTag("table", index);
+        String content = new XmlTagExtractor(html).getTag("table", index);
         if (content == null) {
             throw new IOException(String.format("Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG));
             //Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG);

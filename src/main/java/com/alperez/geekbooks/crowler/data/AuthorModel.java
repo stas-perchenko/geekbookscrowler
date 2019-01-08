@@ -32,7 +32,7 @@ public abstract class AuthorModel {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder setName(String name);
+        public abstract Builder setName(@Nullable String name);
         public abstract Builder setFamilyName(String familyName);
 
         abstract AuthorModel actualBuild();

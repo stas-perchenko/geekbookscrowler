@@ -6,6 +6,7 @@ import com.alperez.siphash.SipHash;
 import com.alperez.siphash.SipHashKey;
 import com.google.auto.value.AutoValue;
 
+import java.awt.geom.Dimension2D;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.List;
@@ -15,6 +16,8 @@ public abstract class BookModel {
     public abstract URL geekBooksAddress();
     @Nullable
     public abstract URL imagePath();
+    @Nullable
+    public abstract Dimension2D imageDimensions();
     public abstract URL pdfPath();
     public abstract Float pdfSize();
     @Nullable
@@ -62,6 +65,7 @@ public abstract class BookModel {
 
         public abstract Builder setGeekBooksAddress(URL geekBooksAddress);
         public abstract Builder setImagePath(@Nullable URL imagePath);
+        public abstract Builder setImageDimensions(@Nullable Dimension2D imageDimensions);
         public abstract Builder setPdfPath(URL pdfPath);
         public abstract Builder setPdfSize(Float pdfSize);
         public abstract Builder setIsbn(@Nullable String isbn);

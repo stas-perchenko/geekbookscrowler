@@ -1,11 +1,11 @@
 package com.alperez.geekbooks.crowler.utils;
 
-public class TagExtractor {
+public class XmlTagExtractor {
 
 
     private final char htmlChars[];
 
-    public TagExtractor(String html) {
+    public XmlTagExtractor(String html) {
         this.htmlChars = html.toCharArray();
     }
 

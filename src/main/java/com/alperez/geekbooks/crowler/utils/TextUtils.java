@@ -1,5 +1,7 @@
 package com.alperez.geekbooks.crowler.utils;
 
+import java.text.ParseException;
+
 public class TextUtils {
 
     public static boolean isEmpty(CharSequence cs) {
@@ -44,6 +46,28 @@ public class TextUtils {
             } catch (NumberFormatException e){}
         }
         return false;
+    }
+
+    public static String ensureISBN(CharSequence src) throws ParseException {
+        int n = src.length();
+        int dst_index = 0;
+        char dst[] = new char[14];
+        for (int i=0; i<n; i++) {
+            char ch = src.charAt(i);
+            if (dst_index == 3) {
+                dst[dst_index ++] = '-';
+                if (ch != '-') {
+                    i --; // Evaluate the same character on the next iteration again
+                }
+            } else if (ch == '-') {
+                continue;
+            } else if (ch >= '0' && ch <= '9') {
+                dst[dst_index ++] = ch;
+            } else {
+                throw new ParseException("Wrong ISBN-13 - "+src, i);
+            }
+        }
+        return new String(dst);
     }
 
     public static boolean checkAsin(CharSequence cs) {

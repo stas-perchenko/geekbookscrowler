@@ -6,7 +6,7 @@ import com.alperez.geekbooks.crowler.data.CategoryItem;
 import com.alperez.geekbooks.crowler.parser.CategoryIndexParser;
 import com.alperez.geekbooks.crowler.utils.HtmlPageLoader;
 import com.alperez.geekbooks.crowler.utils.Log;
-import com.alperez.geekbooks.crowler.utils.TagExtractor;
+import com.alperez.geekbooks.crowler.utils.XmlTagExtractor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,7 +25,8 @@ public class Main {
     public static void main(String[] args) {
         try {
             Log.d(Thread.currentThread().getName(), "main() was started: %s", Arrays.toString(args));
-            Main main = new Main(new URL(args[0]), (args.length > 1) ? Integer.parseInt(args[1]) : 1);
+            URL host = new URL(args[0]);
+            Main main = new Main(host, (args.length > 1) ? Integer.parseInt(args[1]) : 1);
             main.start();
             main.join();
 
@@ -35,14 +36,12 @@ public class Main {
             main.printAllFoundBookReferences();
 
 
-            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(main.foundBookRefs, 1);
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, main.foundBookRefs, 1);
             booksDecoder.start();
             booksDecoder.join();
             Collection<BookModel> books = booksDecoder.getDecodedBooks();
 
             //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 
         } catch (MalformedURLException | InterruptedException e) {
             e.printStackTrace();
@@ -107,7 +106,7 @@ public class Main {
             }
 
 
-            String content = new TagExtractor(startPage).getTag("div", index);
+            String content = new XmlTagExtractor(startPage).getTag("div", index);
             if (content == null) {
                 Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", INITIAL_CONTENT_TAG);
                 return;
