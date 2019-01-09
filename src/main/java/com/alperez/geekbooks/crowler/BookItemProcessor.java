@@ -92,17 +92,13 @@ public class BookItemProcessor implements Runnable {
             ret.put("book", bookBuilder.build());
             ret.put("related", related);
 
-            //Log.d("BOOK", ((BookModel) ret.get("book")).toString());
-            //Log.d("RELATED", related.toString());
-            Log.d("BOOK", "<--- Decoded OK");
+            Log.d("BOOK", "<--- Decoded OK.");
             return ret;
         } catch (Exception e) {
             Log.d("BOOK", "<~~~ Decode ERROR - %s", e.getMessage());
             if (jBookContent != null) {
                 Log.d("JSON", jBookContent.toString());
-            } /*else if (pageHtml != null) {
-                Log.d("HTML", pageHtml);
-            }*/
+            }
             e.printStackTrace(System.out);
             return null;
         }

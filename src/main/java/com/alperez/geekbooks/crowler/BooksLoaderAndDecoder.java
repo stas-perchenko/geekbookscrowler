@@ -119,8 +119,6 @@ public class BooksLoaderAndDecoder {
         synchronized (result) {
             List<BookModel> updatedResult = new ArrayList<>(result.size());
             for (BookModel book : result) {
-                Log.d("RELATIONS", "\t- processing \"%s\"", book.title());
-
                 List<Long> relatedIds = new ArrayList<>(10);
 
                 for (Iterator<Map<String, Object>> itr = relations.iterator(); itr.hasNext(); ) {
@@ -133,6 +131,8 @@ public class BooksLoaderAndDecoder {
                     }
                 }
                 updatedResult.add(book.withRelatedBookIds(relatedIds));
+
+                Log.d("RELATIONS", "\t<--- processed \"%s\". relations - %s", book.title(), relatedIds);
             }
             result.clear();
             result.addAll(updatedResult);

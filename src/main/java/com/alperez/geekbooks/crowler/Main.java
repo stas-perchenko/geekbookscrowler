@@ -25,9 +25,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             Log.d(Thread.currentThread().getName(), "main() was started: %s", Arrays.toString(args));
-            URL host = new URL(args[0]);
+            URL urlStartPage = new URL(args[0]);
             int nThreads = (args.length > 1) ? Integer.parseInt(args[1]) : 1;
-            Main main = new Main(host, nThreads);
+            Main main = new Main(urlStartPage, nThreads);
             main.start();
             main.join();
 
@@ -36,7 +36,7 @@ public class Main {
 
             main.printAllFoundBookReferences();
 
-
+            URL host = new URL(String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost()));
             BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, main.foundBookRefs, nThreads);
             booksDecoder.start();
             booksDecoder.join();
