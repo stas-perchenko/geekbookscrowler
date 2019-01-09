@@ -2,6 +2,7 @@ package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.utils.Log;
 import com.alperez.geekbooks.crowler.utils.NonNull;
 
 import java.net.URL;
@@ -9,17 +10,27 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BooksLoaderAndDecoder {
+    public static final int STATE_CREATED = 0;
+    public static final int STATE_STARTED = 1;
+    public static final int STATE_LOADED = 2;
+    public static final int STATE_COMPLETED = 3;
 
-
+    //--- Source and parameters ---
     private final URL urlHost;
-    private final ExecutorService exec;
     private final int nThreads;
-    private boolean isStarted;
     final Iterator<BookRefItem> src;
 
+    //--- Workers and state ---
+    private final AtomicInteger state = new AtomicInteger(STATE_CREATED);
+    private final AtomicInteger nWorkingThreads = new AtomicInteger(0);
+    private final ExecutorService exec;
+
+    //--- Result ---
     private final List<BookModel> result = new LinkedList<>();
+    private final List<Map<String, Object>> relations = new LinkedList<>();
 
     public BooksLoaderAndDecoder(@NonNull URL urlHost, Collection<BookRefItem> bookRefs, int nThreads) {
         this.urlHost = urlHost;
@@ -27,53 +38,132 @@ public class BooksLoaderAndDecoder {
         this.src = bookRefs.iterator();
     }
 
-    public synchronized boolean isStarted() {
-        return isStarted;
+    public int getState() {
+        synchronized (state) {
+            return state.get();
+        }
     }
 
-    public synchronized void start() {
-        if (isStarted) {
+    public synchronized void setState(int state) {
+        synchronized (this.state) {
+            this.state.set(state);
+        }
+    }
+
+    public void start() {
+        if (getState() == STATE_CREATED) {
+            setState(STATE_STARTED);
+        } else {
             throw new IllegalStateException("Already started");
         }
 
-        for (int i=0; i<nThreads; i++) {
-            exec.execute(new BookItemProcessor(urlHost, () -> {
-                        synchronized (src) {
-                            return src.hasNext() ? src.next() : null;
+        synchronized (exec) {
+            for (int i=0; i<nThreads; i++) {
+                exec.execute(new BookItemProcessor(urlHost, () -> {
+                    synchronized (src) {
+                        return src.hasNext() ? src.next() : null;
+                    }
+                },
+                        (book, relatedBooks) -> addDecodedBook(book, relatedBooks),
+                        () -> { // Thread complete listener
+                            if (nWorkingThreads.decrementAndGet() == 0) {
+                                setState(STATE_LOADED);
+                                Log.d("RELATIONS", "---> Start evaluate relations at %1$tT.%1$tL", new Date());
+                                resolveBookRelations();
+                                Log.d("RELATIONS", "<--- End evaluate relations at %1$tT.%1$tL", new Date());
+                                setState(STATE_COMPLETED);
+                            }
                         }
-                    },
-                    (book, relatedBooks) -> addDecodedBook(book) //TODO Handle related books !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            ));
+                ));
+                nWorkingThreads.incrementAndGet();
+            }
         }
-
-        isStarted = true;
     }
 
-    public synchronized void join() throws InterruptedException {
-        if (!isStarted) throw new IllegalStateException("Not started yet");
-        exec.shutdown();
-        exec.awaitTermination(45, TimeUnit.MINUTES);
-        if (!exec.isTerminated()) throw new InterruptedException("timeout");
+    public void join() throws InterruptedException {
+        if (getState() != STATE_STARTED) {
+            throw new IllegalStateException("Wrong state - " + getState());
+        } else {
+            synchronized (exec) {
+                exec.shutdown();
+                exec.awaitTermination(45, TimeUnit.MINUTES);
+                if (!exec.isTerminated()) throw new InterruptedException("timeout");
+            }
+        }
     }
 
 
 
 
-    private void addDecodedBook(BookModel book) {
+    private void addDecodedBook(BookModel book, List<URL> related) {
         synchronized (result) {
             for (BookModel b : result) {
                 if (b.id() == book.id()) return;
             }
             result.add(book);
+            Map<String, Object> relItem = new HashMap<>();
+            relItem.put("book", book);
+            relItem.put("related", related);
+            relations.add(relItem);
         }
     }
 
-    public Collection<BookModel> getDecodedBooks() {
-        List<BookModel> ret;
-        synchronized (result) {
-            ret = new ArrayList<>(result.size());
-            ret.addAll(result);
+    private void resolveBookRelations() {
+        int state = getState();
+        if (state == STATE_COMPLETED) {
+            return; //Already done
+        } else if (state < STATE_LOADED) {
+            throw new IllegalStateException("Not loaded yet");
         }
-        return ret;
+
+        synchronized (result) {
+            List<BookModel> updatedResult = new ArrayList<>(result.size());
+            for (BookModel book : result) {
+                Log.d("RELATIONS", "\t- processing \"%s\"", book.title());
+
+                List<Long> relatedIds = new ArrayList<>(10);
+
+                for (Iterator<Map<String, Object>> itr = relations.iterator(); itr.hasNext(); ) {
+                    Map<String, Object> relItem = itr.next();
+                    if (((BookModel) relItem.get("book")).id() == book.id()) {
+                        itr.remove();
+                        List<URL> relatedURLs = (List<URL>) relItem.get("related");
+                        mapBookURLsToIds(relatedURLs, relatedIds);
+                        break;
+                    }
+                }
+                updatedResult.add(book.withRelatedBookIds(relatedIds));
+            }
+            result.clear();
+            result.addAll(updatedResult);
+        }
+    }
+
+    private void mapBookURLsToIds(@NonNull List<URL> relatedURLs, @NonNull List<Long> relatedIds) {
+        synchronized (result) {
+            for (URL u : relatedURLs) {
+                for (BookModel book : result) {
+                    if(book.geekBooksAddress().equals(u)) {
+                        relatedIds.add(book.id());
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+    public Collection<BookModel> getDecodedBooks() {
+        if (getState() == STATE_COMPLETED) {
+            List<BookModel> ret;
+            synchronized (result) {
+                ret = new ArrayList<>(result.size());
+                ret.addAll(result);
+            }
+            return ret;
+        } else {
+            throw new IllegalStateException("Not completed yet");
+        }
     }
 }

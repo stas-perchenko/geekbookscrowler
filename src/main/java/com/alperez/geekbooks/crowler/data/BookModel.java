@@ -1,14 +1,17 @@
 package com.alperez.geekbooks.crowler.data;
 
+import com.alperez.geekbooks.crowler.utils.NonNull;
 import com.alperez.geekbooks.crowler.utils.Nullable;
 import com.alperez.geekbooks.crowler.utils.TextUtils;
 import com.alperez.siphash.SipHash;
 import com.alperez.siphash.SipHashKey;
 import com.google.auto.value.AutoValue;
+import com.sun.javafx.UnmodifiableArrayList;
 
 import java.awt.geom.Dimension2D;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 @AutoValue
@@ -33,6 +36,7 @@ public abstract class BookModel {
     public abstract String description();
     public abstract List<TagModel> tags();
     public abstract BookCategoryModel category();
+    public abstract List<Long> relatedBookIds();
 
     private long id;
 
@@ -78,10 +82,8 @@ public abstract class BookModel {
         public abstract Builder setDescription(String description);
         public abstract Builder setTags(List<TagModel> tags);
         public abstract Builder setCategory(BookCategoryModel category);
-
-
+        public abstract Builder setRelatedBookIds(List<Long> relatedBookIds);
         abstract BookModel actualBuild();
-
         public BookModel build() {
             BookModel instance = actualBuild();
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-20, 109, -21, 99, -27, 19, -51, 96, 71, 31, 96, -34, 1, -83, 3, 117});
@@ -92,6 +94,31 @@ public abstract class BookModel {
             }
             return instance;
         }
+
+    }
+
+    public BookModel withRelatedBookIds(@NonNull List<Long> ids) {
+        Long id_arr[] = ids.toArray(new Long[ids.size()]);
+        AuthorModel new_authors[] = authors().toArray(new AuthorModel[authors().size()]);
+        TagModel new_tags[] = tags().toArray(new TagModel[tags().size()]);
+        return builder()
+                .setGeekBooksAddress(geekBooksAddress())
+                .setImagePath(imagePath())
+                .setImageDimensions(imageDimensions())
+                .setPdfPath(pdfPath())
+                .setPdfSize(pdfSize())
+                .setIsbn(isbn())
+                .setAsin(asin())
+                .setTitle(title())
+                .setSubtitle(subtitle())
+                .setAuthors(new UnmodifiableArrayList<>(new_authors, new_authors.length))
+                .setYear(year())
+                .setNumPages(numPages())
+                .setDescription(description())
+                .setTags(new UnmodifiableArrayList<>(new_tags, new_tags.length))
+                .setCategory(category().clone())
+                .setRelatedBookIds(new UnmodifiableArrayList<>(id_arr, id_arr.length))
+                .build();
 
     }
 

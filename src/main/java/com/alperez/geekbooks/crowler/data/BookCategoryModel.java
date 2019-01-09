@@ -8,7 +8,7 @@ import com.google.auto.value.AutoValue;
 import java.io.UnsupportedEncodingException;
 
 @AutoValue
-public abstract class BookCategoryModel {
+public abstract class BookCategoryModel implements Cloneable {
     public abstract int level();
     public abstract String title();
     @Nullable
@@ -50,5 +50,12 @@ public abstract class BookCategoryModel {
 
         if (sb.length() > 0) sb.append("->");
         sb.append(title());
+    }
+
+    @Override
+    protected BookCategoryModel clone() {
+        BookCategoryModel p = parent();
+        BookCategoryModel clonedP = (p == null) ? null : p.clone();
+        return BookCategoryModel.create(level(), title(), clonedP);
     }
 }

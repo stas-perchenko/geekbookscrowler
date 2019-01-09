@@ -26,7 +26,8 @@ public class Main {
         try {
             Log.d(Thread.currentThread().getName(), "main() was started: %s", Arrays.toString(args));
             URL host = new URL(args[0]);
-            Main main = new Main(host, (args.length > 1) ? Integer.parseInt(args[1]) : 1);
+            int nThreads = (args.length > 1) ? Integer.parseInt(args[1]) : 1;
+            Main main = new Main(host, nThreads);
             main.start();
             main.join();
 
@@ -36,7 +37,7 @@ public class Main {
             main.printAllFoundBookReferences();
 
 
-            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, main.foundBookRefs, 1);
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, main.foundBookRefs, nThreads);
             booksDecoder.start();
             booksDecoder.join();
             Collection<BookModel> books = booksDecoder.getDecodedBooks();

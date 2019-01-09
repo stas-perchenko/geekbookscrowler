@@ -35,22 +35,34 @@ public class BookItemProcessor implements Runnable {
         void onBookDecoded(@NonNull BookModel book, List<URL> relatedBookLinks);
     }
 
+    public interface OnCompleteListener {
+        void onComplete();
+    }
+
     private final String host;
     private final BookRefItemProvider src;
     private final OnBookDecodeListener dst;
+    private final OnCompleteListener complCallback;
 
-    public BookItemProcessor(@NonNull URL urlHost, @NonNull BookRefItemProvider src, @NonNull OnBookDecodeListener dst) {
+    public BookItemProcessor(@NonNull URL urlHost, @NonNull BookRefItemProvider src, @NonNull OnBookDecodeListener dst, @Nullable OnCompleteListener complCallback) {
         host = urlHost.toString();
         this.src = src;
         this.dst = dst;
+        this.complCallback = complCallback;
     }
 
     @Override
     public void run() {
-        BookRefItem ref;
-        while((ref = src.getBookRefItem()) != null) {
-            Map<String, Object> result = evaluateBookReference(ref);
-            if (result != null) dst.onBookDecoded((BookModel) result.get("book"), (List<URL>) result.get("related"));
+        try {
+            BookRefItem ref;
+            while((ref = src.getBookRefItem()) != null) {
+                Map<String, Object> result = evaluateBookReference(ref);
+                if (result != null) dst.onBookDecoded((BookModel) result.get("book"), (List<URL>) result.get("related"));
+            }
+        } catch (Exception e) {
+
+        } finally {
+            if (complCallback != null) complCallback.onComplete();
         }
     }
 
@@ -63,7 +75,7 @@ public class BookItemProcessor implements Runnable {
         String pageHtml = null;
         JSONObject jBookContent = null;
         try {
-            Log.d("\r\n\r\nBOOK", "&1$tT.&1$tL ---> Start loading %2$s", new Date(), ref);
+            Log.d("\r\n\r\nBOOK", "%1$tT.%1$tL ---> Start loading %2$s", new Date(), ref);
             pageHtml = new HtmlPageLoader(ref.getUrl()).load(50000);
 
             BookCategoryModel category = extractBookCategory(pageHtml);
@@ -72,7 +84,8 @@ public class BookItemProcessor implements Runnable {
 
             BookModel.Builder bookBuilder = BookModel.builder()
                     .setGeekBooksAddress(ref.getUrl())
-                    .setCategory(category);
+                    .setCategory(category)
+                    .setRelatedBookIds(new ArrayList<>());
             List<URL> related = decodeBookContent(jBookContent, bookBuilder);
 
             Map<String, Object> ret = new HashMap<>();
