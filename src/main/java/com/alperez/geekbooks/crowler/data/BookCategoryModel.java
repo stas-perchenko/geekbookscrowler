@@ -21,7 +21,7 @@ public abstract class BookCategoryModel implements Cloneable {
                 ? String.format("%d:%s", level, title)
                 : String.format("%d:%d:%s", parent.id(), level, title);
         try {
-            instance.id = SipHash.calculateHash(key, hashText.getBytes("UTF-8"));
+            instance.id = SipHash.calculateHash(key, hashText.getBytes("UTF-8")) >>> 1;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

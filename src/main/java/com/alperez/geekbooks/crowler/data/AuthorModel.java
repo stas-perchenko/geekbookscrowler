@@ -41,7 +41,7 @@ public abstract class AuthorModel {
             AuthorModel instance = actualBuild();
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-123, -82, 6, -17, -105, 33, 71, 113, -101, 121, -29, -71, 33, 107, 6, -97});
             try {
-                instance.id = SipHash.calculateHash(key, String.format("%s:%s", instance.name(), instance.familyName()).getBytes("UTF-8"));
+                instance.id = SipHash.calculateHash(key, String.format("%s:%s", instance.name(), instance.familyName()).getBytes("UTF-8")) >>> 1;
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

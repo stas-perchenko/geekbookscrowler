@@ -88,7 +88,7 @@ public abstract class BookModel {
             BookModel instance = actualBuild();
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-20, 109, -21, 99, -27, 19, -51, 96, 71, 31, 96, -34, 1, -83, 3, 117});
             try {
-                instance.id = SipHash.calculateHash(key, instance.getIdHashText().getBytes("UTF-8"));
+                instance.id = SipHash.calculateHash(key, instance.getIdHashText().getBytes("UTF-8")) >>> 1;
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

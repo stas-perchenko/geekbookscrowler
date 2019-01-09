@@ -11,22 +11,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class BookListPageParcer {
+public class BookListPageParser {
     private final JSONObject contentJson;
     private final String urlHost;
 
-    public BookListPageParcer(JSONObject contentJson, String urlHost) {
+    public BookListPageParser(JSONObject contentJson, String urlHost) {
         this.contentJson = contentJson;
         this.urlHost = urlHost;
     }
 
-    public Collection<BookRefItem> parse() {
+    public Collection<BookRefItem> parse() throws JSONException {
         List<BookRefItem> ret = new ArrayList<>();
-        try {
-            evaluateJson(ret);
-        } catch (JSONException e){
-            throw e;
-        }
+        evaluateJson(ret);
         return ret;
     }
 

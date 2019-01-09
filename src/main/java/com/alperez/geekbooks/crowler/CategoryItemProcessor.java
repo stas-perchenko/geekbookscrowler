@@ -2,81 +2,59 @@ package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookRefItem;
 import com.alperez.geekbooks.crowler.data.CategoryItem;
-import com.alperez.geekbooks.crowler.parser.BookListPageParcer;
-import com.alperez.geekbooks.crowler.utils.HtmlPageLoader;
-import com.alperez.geekbooks.crowler.utils.Log;
-import com.alperez.geekbooks.crowler.utils.XmlTagExtractor;
+import com.alperez.geekbooks.crowler.parser.BookListPageParser;
+import com.alperez.geekbooks.crowler.utils.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CategoryProcessor implements Runnable {
+public class CategoryItemProcessor implements Runnable {
     public static final String BOOKS_PAGE_CONTENT_TAG = "<table class=\"book-list\">";
     private static final AtomicInteger static_inst_cntr = new AtomicInteger(0);
 
-    public interface Callback {
+
+    public interface CategoryItemProvider {
+        @Nullable
+        CategoryItem getCategoryItem();
+    }
+
+    public interface OnBookFoundListener {
         void onBookFound(Collection<BookRefItem> refItems);
     }
 
     private final int nInstance;
-    private final Deque<CategoryItem> itemsQueue;
     private final URL urlHost;
-    private final Callback callback;
+    private final CategoryItemProvider src;
+    private final OnBookFoundListener dst;
 
     private final String TAG;
 
-    public CategoryProcessor(Deque<CategoryItem> itemsQueue, URL urlHost, Callback cb) {
-        this.itemsQueue = itemsQueue;
+    public CategoryItemProcessor(URL urlHost, @NonNull CategoryItemProvider src, @NonNull OnBookFoundListener cb) {
         this.urlHost = urlHost;
-        this.callback = cb;
+        this.src = src;
+        this.dst = cb;
         nInstance = static_inst_cntr.incrementAndGet();
         TAG = String.format("%s-%d", getClass().getSimpleName(), nInstance);
     }
 
     @Override
     public void run() {
-        Log.d(TAG, "---> run() start");
-        try {
-            synchronized (itemsQueue) {
-                if (itemsQueue.isEmpty()) {
-                    try {
-                        itemsQueue.wait(45000);
-                    } catch (InterruptedException e) {
-
-                    }
-                    if (itemsQueue.isEmpty()) return;
-                }
-            }
-
-            for (;;) {
-                CategoryItem runItem = null;
-                synchronized (itemsQueue) {
-                    if (itemsQueue.isEmpty()) {
-                        return;
-                    } else {
-                        runItem = itemsQueue.removeFirst();
-                    }
-                }
-
-                try {
-                    evaluateCategoryItem(runItem);
-                } catch (IOException e) {
-                    Log.d(TAG, "<~~~  Error evaluate Category Item - "+e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        } finally {
-            Log.d(TAG, "<--- run() end");
+        CategoryItem runItem;
+        while ((runItem = src.getCategoryItem()) != null) {
+            Collection<BookRefItem> foundRefs = evaluateCategoryItem(runItem);
+            dst.onBookFound(foundRefs);
         }
     }
 
 
-    private void evaluateCategoryItem(CategoryItem runItem) throws IOException {
+    private Collection<BookRefItem> evaluateCategoryItem(CategoryItem runItem) {
+        List<BookRefItem> allRefs = new LinkedList<>();
         int nBooksFound = 0;
         int nPage = 1;
         do {
@@ -85,11 +63,13 @@ public class CategoryProcessor implements Runnable {
             String pageHtml = new HtmlPageLoader(pageUrl).load(1000000);
             Log.d(TAG, String.format("<--- Books page %d has been loaded. Size=%d", nPage, pageHtml.length()));
 
-            int pgBooks = decodeBooksPage(pageHtml);
-            Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pgBooks, runItem.getTitle(), nPage));
+            Collection<BookRefItem> pageRefs = decodeBooksPage(pageHtml);
+            allRefs.addAll(pageRefs);
+            Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pageRefs.size(), runItem.getTitle(), nPage));
 
-            nBooksFound += pgBooks;
+            nBooksFound += pageRefs.size();
         } while ((nBooksFound < runItem.getNBooks()) & (nPage++ < 80));
+        return allRefs;
     }
 
     /**
@@ -98,7 +78,7 @@ public class CategoryProcessor implements Runnable {
      * @return number of found book references
      * @throws IOException
      */
-    private int decodeBooksPage(String html) throws IOException {
+    private Collection<BookRefItem> decodeBooksPage(String html) throws IOException {
         int index = html.indexOf(BOOKS_PAGE_CONTENT_TAG);
         if (index < 0) {
             throw new IOException(String.format("Bad page content. The %s is not found.", BOOKS_PAGE_CONTENT_TAG));
@@ -123,11 +103,7 @@ public class CategoryProcessor implements Runnable {
             throw new IOException("cannot convert HTML content to JSON - "+e.getMessage(), e);
         }
 
-        Collection<BookRefItem> foundRefs = new BookListPageParcer(jPage, urlHost.toString()).parse();
-        if (!foundRefs.isEmpty()) {
-            callback.onBookFound(foundRefs);
-        }
-
-        return foundRefs.size();
+        BookListPageParser pageParser = new BookListPageParser(jPage, urlHost.toString());
+        return pageParser.parse();
     }
 }

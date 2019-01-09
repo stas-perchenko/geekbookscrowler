@@ -44,7 +44,7 @@ public class BooksLoaderAndDecoder {
         }
     }
 
-    public synchronized void setState(int state) {
+    private synchronized void setState(int state) {
         synchronized (this.state) {
             this.state.set(state);
         }
@@ -80,13 +80,13 @@ public class BooksLoaderAndDecoder {
         }
     }
 
-    public void join() throws InterruptedException {
+    public void join(long timeout, @NonNull TimeUnit units) throws InterruptedException {
         if (getState() != STATE_STARTED) {
             throw new IllegalStateException("Wrong state - " + getState());
         } else {
             synchronized (exec) {
                 exec.shutdown();
-                exec.awaitTermination(45, TimeUnit.MINUTES);
+                exec.awaitTermination(timeout, units);
                 if (!exec.isTerminated()) throw new InterruptedException("timeout");
             }
         }
