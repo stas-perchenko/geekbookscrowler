@@ -58,19 +58,42 @@ public class CategoryItemProcessor implements Runnable {
         int nBooksFound = 0;
         int nPage = 1;
         do {
-            URL pageUrl = new URL(String.format("%s?p=%d", runItem.getUrl(), nPage));
-            Log.d("\n"+TAG, String.format("---> Start loading books page %d for %s - %s", nPage, runItem.getTitle(), pageUrl));
-            String pageHtml = new HtmlPageLoader(pageUrl).load(1000000);
-            Log.d(TAG, String.format("<--- Books page %d has been loaded. Size=%d", nPage, pageHtml.length()));
+            String pageHtml = loadCategoryPage(runItem, nPage);
 
-            Collection<BookRefItem> pageRefs = decodeBooksPage(pageHtml);
-            allRefs.addAll(pageRefs);
-            Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pageRefs.size(), runItem.getTitle(), nPage));
+            if (pageHtml != null) {
+                try {
+                    Collection<BookRefItem> pageRefs = decodeBooksPage(pageHtml);
+                    allRefs.addAll(pageRefs);
+                    nBooksFound += pageRefs.size();
+                    //TODO Log success - Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pageRefs.size(), runItem.getTitle(), nPage));
+                } catch (IOException e) {
+                    //TODO Log Error
+                    e.printStackTrace(System.out);
+                    e.printStackTrace(System.err);
+                }
+            }
 
-            nBooksFound += pageRefs.size();
-        } while ((nBooksFound < runItem.getNBooks()) & (nPage++ < 80));
+        } while ((nBooksFound < runItem.getNBooks()) & (nPage++ < 50));
         return allRefs;
     }
+
+    @Nullable
+    private String loadCategoryPage(CategoryItem category, int nPage) {
+        try {
+            URL pageUrl = new URL(String.format("%s?p=%d", category.getUrl(), nPage));
+            //TODO log start - Log.d("\n"+TAG, String.format("---> Start loading books page %d for %s - %s", nPage, category.getTitle(), pageUrl));
+
+            String html = (new HtmlPageLoader(pageUrl)).load(1000000);
+            //TODO log end - Log.d(TAG, String.format("<--- Books page %d has been loaded. Size=%d", nPage, pageHtml.length()));
+            return html;
+        } catch (IOException e) {
+            //TODO Log error
+            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
+            return null;
+        }
+    }
+
 
     /**
      *
@@ -104,6 +127,10 @@ public class CategoryItemProcessor implements Runnable {
         }
 
         BookListPageParser pageParser = new BookListPageParser(jPage, urlHost.toString());
-        return pageParser.parse();
+        try {
+            return pageParser.parse();
+        } catch (JSONException e) {
+            throw new IOException("cannot parse category page JSON to Book reference items - "+e.getMessage(), e);
+        }
     }
 }

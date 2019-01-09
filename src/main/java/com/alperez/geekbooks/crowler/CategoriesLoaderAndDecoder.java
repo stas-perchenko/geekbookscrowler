@@ -58,23 +58,35 @@ public class CategoriesLoaderAndDecoder {
         }
     }
 
-    private final Thread worker1 = new Thread(this::parseStartPageForCategories);
 
-    public void start() {
-        if (getState() == STATE_CREATED) {
+
+    public void start() throws IOException {
+        if (getState() != STATE_CREATED) {
             throw new IllegalStateException("Already started");
         } else{
             setState(STATE_SEARCH_CATEGORIES);
+
+            parseStartPageForCategories();
+
+            setState(STATE_SEARCH_BOOKS);
+
             synchronized (exec) {
                 for (int i = 0; i < (nThreads); i++) {
-                    exec.execute(new CategoryItemProcessor(categoryItems, urlHost, (refs) -> {
-                        synchronized (foundBookRefs) {
-                            foundBookRefs.addAll(refs);
-                        }
-                    }));
+                    exec.execute(
+                        new CategoryItemProcessor(urlHost,
+                            () -> {
+                                synchronized (categoryItems) {
+                                    return categoryItems.isEmpty() ? null : categoryItems.removeFirst();
+                                }
+                            }, (refs) -> {
+                                synchronized (foundBookRefs) {
+                                    foundBookRefs.addAll(refs);
+                                }
+                            }
+                        )
+                    );
                 }
             }
-            worker1.start();
         }
     }
 
@@ -85,76 +97,67 @@ public class CategoriesLoaderAndDecoder {
             synchronized (exec) {
                 exec.shutdown();
                 exec.awaitTermination(timeout, units);
+                setState(STATE_COMPLETED);
                 if (!exec.isTerminated()) throw new InterruptedException("timeout");
             }
         }
     }
 
 
+    public Collection<BookRefItem> getDecodedBookReferences() {
+        if (getState() == STATE_COMPLETED) {
+            List<BookRefItem> ret;
+            synchronized (foundBookRefs) {
+                ret = new ArrayList<>(foundBookRefs.size());
+                ret.addAll(foundBookRefs);
+            }
+            return ret;
+        } else {
+            throw new IllegalStateException("Not completed yet");
+        }
+    }
+
+
+
+
     public static final String INITIAL_CONTENT_TAG = "<div class=\"content clearfix category index\">";
 
-    private void parseStartPageForCategories() {
-        long tStart = System.currentTimeMillis();
+    private void parseStartPageForCategories() throws IOException {
+        Log.d(Thread.currentThread().getName(), "--> Start loading initial page - "+urlStartPage);
+        String startPage = new HtmlPageLoader(urlStartPage).load(1000000);
+        Log.d(Thread.currentThread().getName(), "<-- Start page has been loaded. Size="+startPage.length());
+
+        int index = startPage.indexOf(INITIAL_CONTENT_TAG);
+        if (index < 0) {
+            Log.d(Thread.currentThread().getName(), "Bad page content. The %s is not found.", INITIAL_CONTENT_TAG);
+            return;
+        }
+
+
+        String content = new XmlTagExtractor(startPage).getTag("div", index);
+        if (content == null) {
+            Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", INITIAL_CONTENT_TAG);
+            return;
+        } else {
+            Log.d(Thread.currentThread().getName(), "HTML content extracted. Size = "+content.length());
+        }
+
+
+        JSONObject jPage;
         try {
-            Log.d(Thread.currentThread().getName(), "--> Start loading initial page - "+urlStartPage);
-            String startPage = new HtmlPageLoader(urlStartPage).load(1000000);
-            Log.d(Thread.currentThread().getName(), "<-- Start page has been loaded. Size="+startPage.length());
+            jPage = org.json.XML.toJSONObject(content, true);
+            Log.d(Thread.currentThread().getName(), "HTML content was successfully converted to JSON");
+        } catch (JSONException e) {
+            Log.d(Thread.currentThread().getName(), "cannot convert HTML content to JSON - "+e.getMessage());
+            return;
+        }
 
-            int index = startPage.indexOf(INITIAL_CONTENT_TAG);
-            if (index < 0) {
-                Log.d(Thread.currentThread().getName(), "Bad page content. The %s is not found.", INITIAL_CONTENT_TAG);
-                return;
-            }
+        CategoryIndexParser itemsParser = new CategoryIndexParser(jPage, urlHost.toString());
 
-
-            String content = new XmlTagExtractor(startPage).getTag("div", index);
-            if (content == null) {
-                Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", INITIAL_CONTENT_TAG);
-                return;
-            } else {
-                Log.d(Thread.currentThread().getName(), "HTML content extracted. Size = "+content.length());
-            }
-
-
-            JSONObject jPage = null;
-            try {
-                jPage = org.json.XML.toJSONObject(content, true);
-                Log.d(Thread.currentThread().getName(), "HTML content was successfully converted to JSON");
-            } catch (JSONException e) {
-                Log.d(Thread.currentThread().getName(), "cannot convert HTML content to JSON - "+e.getMessage());
-                return;
-            }
-
-            Collection<CategoryItem> items = new CategoryIndexParser(jPage, urlHost.toString()).parse();
-
-            ensureSpentTime(tStart, 300);
-
-            synchronized (categoryItems) {
-                categoryItems.addAll(items);
-                categoryItems.notifyAll();
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-            ensureSpentTime(tStart, 300);
-            synchronized (categoryItems) {
-                categoryItems.notifyAll();
-            }
+        synchronized (categoryItems) {
+            categoryItems.addAll(itemsParser.parse());
         }
     }
 
-    private void ensureSpentTime(long tStart, int needSpend) {
-        int dt = (int)(System.currentTimeMillis() - tStart);
-        if (dt < needSpend) {
-            try {
-                Thread.sleep(needSpend - dt);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-    }
+
 }

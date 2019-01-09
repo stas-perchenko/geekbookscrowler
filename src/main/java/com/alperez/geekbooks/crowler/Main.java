@@ -4,6 +4,7 @@ import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
 import com.alperez.geekbooks.crowler.utils.Log;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -24,25 +25,21 @@ public class Main {
             booksSearcher.start();
             booksSearcher.join(45, TimeUnit.MINUTES);
 
-            /*Main main = new Main(urlStartPage, nThreads);
-            main.start();
-            main.join();
 
-            // The set of BookRefItem is filled in here
+            Collection<BookRefItem> refs = booksSearcher.getDecodedBookReferences();
 
-
-            main.printAllFoundBookReferences();*/
+            printAllFoundBookReferences(refs);
 
             URL host = new URL(String.format("%s://%s", urlStartPage.getProtocol(), urlStartPage.getHost()));
-            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, main.foundBookRefs, nThreads);
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, refs, nThreads);
             booksDecoder.start();
             booksDecoder.join(45, TimeUnit.MINUTES);
             Collection<BookModel> books = booksDecoder.getDecodedBooks();
 
             //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        } catch (MalformedURLException | InterruptedException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }
         Log.d(Thread.currentThread().getName(), "main() has been finished");
@@ -54,7 +51,7 @@ public class Main {
 
 
 
-    public void printAllFoundBookReferences() {
+    public static void printAllFoundBookReferences(Collection<BookRefItem> foundBookRefs) {
         System.out.println(String.format("\n\n===================  Found totally %d book references  ==================", foundBookRefs.size()));
         for (BookRefItem ref : foundBookRefs) {
             System.out.println("\t"+ref+";");

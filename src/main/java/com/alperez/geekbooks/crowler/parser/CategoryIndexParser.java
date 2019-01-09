@@ -22,14 +22,18 @@ public class CategoryIndexParser {
         this.urlHost = urlHost;
     }
 
-    public Collection<CategoryItem> parse() {
+    public Collection<CategoryItem> parse() throws JSONException {
         Set<CategoryItem> result = new HashSet<>();
         evaluateObject(contentJson, result);
         return result;
     }
 
-
-    private void evaluateObject(JSONObject json, Collection<CategoryItem> dst) {
+    /**
+     * This is recursive call
+     * @param json
+     * @param dst
+     */
+    private void evaluateObject(JSONObject json, Collection<CategoryItem> dst) throws JSONException {
 
         if (testForCategoryItem(json)) {
             try {
