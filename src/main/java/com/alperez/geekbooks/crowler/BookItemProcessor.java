@@ -5,12 +5,8 @@ import com.alperez.geekbooks.crowler.data.BookCategoryModel;
 import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
 import com.alperez.geekbooks.crowler.data.TagModel;
-import com.alperez.geekbooks.crowler.utils.HtmlPageLoader;
-import com.alperez.geekbooks.crowler.utils.NonNull;
-import com.alperez.geekbooks.crowler.utils.Nullable;
-import com.alperez.geekbooks.crowler.utils.XmlTagExtractor;
-import com.alperez.geekbooks.crowler.utils.TextUtils;
-import com.alperez.geekbooks.crowler.utils.Log;
+import com.alperez.geekbooks.crowler.utils.*;
+//import com.alperez.geekbooks.crowler.utils.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,18 +65,20 @@ public class BookItemProcessor implements Runnable {
     public static final String BREADCRUMBS_TAG = "<ul class=\"breadcrumbs\">";
     public static final String CONTENT_TABLE_TAG = "<table class=\"book-info\">";
 
+
+
     @Nullable
     private Map<String, Object> evaluateBookReference(BookRefItem ref) {
 
-        String pageHtml = null;
+        List<Log.LogEntry> logs = new ArrayList<>(4);
         JSONObject jBookContent = null;
         try {
-            Log.d("\r\n\r\nBOOK", "%1$tT.%1$tL ---> Start loading %2$s", new Date(), ref);
-            pageHtml = new HtmlPageLoader(ref.getUrl()).load(50000);
+            logs.add(new Log.LogEntry("\r\n\r\nBOOK", String.format("%1$tT.%1$tL ---> Start loading %2$s", new Date(), ref)));
+            String pageHtml = new HtmlPageLoader(ref.getUrl()).load(50000);
 
             BookCategoryModel category = extractBookCategory(pageHtml);
 
-            jBookContent = extractJsonContent(pageHtml);
+            jBookContent = extractJsonContent(pageHtml, logs);
 
             BookModel.Builder bookBuilder = BookModel.builder()
                     .setGeekBooksAddress(ref.getUrl())
@@ -92,15 +90,17 @@ public class BookItemProcessor implements Runnable {
             ret.put("book", bookBuilder.build());
             ret.put("related", related);
 
-            Log.d("BOOK", "<--- Decoded OK.");
+            logs.add(new Log.LogEntry("BOOK", "<--- Decoded OK."));
             return ret;
         } catch (Exception e) {
-            Log.d("BOOK", "<~~~ Decode ERROR - %s", e.getMessage());
+            logs.add(new Log.LogEntry("BOOK", "<~~~ Decode ERROR - " + e.getMessage()));
             if (jBookContent != null) {
-                Log.d("JSON", jBookContent.toString());
+                logs.add(new Log.LogEntry("JSON_CONTENT", jBookContent.toString()));
             }
             e.printStackTrace(System.out);
             return null;
+        } finally {
+            Log.d(logs);
         }
     }
 
@@ -132,7 +132,7 @@ public class BookItemProcessor implements Runnable {
         return categ;
     }
 
-    private JSONObject extractJsonContent(String html) throws XMLParseException {
+    private JSONObject extractJsonContent(String html, List<Log.LogEntry> logs) throws XMLParseException {
         int iStart = html.indexOf(CONTENT_TABLE_TAG);
         if (iStart < 0) throw new JSONException("Breadcrumbs tag not found");
 
@@ -172,7 +172,7 @@ public class BookItemProcessor implements Runnable {
         try {
             json = org.json.XML.toJSONObject(htmlTable, false);
         } catch (JSONException e) {
-            Log.d("HTML_CONTENT", htmlTable);
+            logs.add(new Log.LogEntry("HTML_CONTENT", htmlTable));
             throw e;
         }
 

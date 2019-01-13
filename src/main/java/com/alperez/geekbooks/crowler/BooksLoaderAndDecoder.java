@@ -18,6 +18,8 @@ public class BooksLoaderAndDecoder {
     public static final int STATE_LOADED = 2;
     public static final int STATE_COMPLETED = 3;
 
+    public static final String TAG_RELATIONS = "RELATIONS";
+
     //--- Source and parameters ---
     private final URL urlHost;
     private final int nThreads;
@@ -59,22 +61,26 @@ public class BooksLoaderAndDecoder {
 
         synchronized (exec) {
             for (int i=0; i<nThreads; i++) {
-                exec.execute(new BookItemProcessor(urlHost, () -> {
-                    synchronized (src) {
-                        return src.hasNext() ? src.next() : null;
-                    }
-                },
-                        (book, relatedBooks) -> addDecodedBook(book, relatedBooks),
-                        () -> { // Thread complete listener
-                            if (nWorkingThreads.decrementAndGet() == 0) {
-                                setState(STATE_LOADED);
-                                Log.d("RELATIONS", "---> Start evaluate relations at %1$tT.%1$tL", new Date());
-                                resolveBookRelations();
-                                Log.d("RELATIONS", "<--- End evaluate relations at %1$tT.%1$tL", new Date());
-                                setState(STATE_COMPLETED);
+                exec.execute(
+                    new BookItemProcessor(
+                            urlHost,
+                            () -> {
+                                synchronized (src) {
+                                    return src.hasNext() ? src.next() : null;
+                                }
+                            },
+                            (book, relatedBooks) -> addDecodedBook(book, relatedBooks),
+                            () -> { // Thread complete listener
+                                if (nWorkingThreads.decrementAndGet() == 0) {
+                                    setState(STATE_LOADED);
+                                    Log.d(TAG_RELATIONS, "---> Start evaluate relations at %1$tT.%1$tL", new Date());
+                                    resolveBookRelations();
+                                    Log.d(TAG_RELATIONS, "<--- End evaluate relations at %1$tT.%1$tL", new Date());
+                                    setState(STATE_COMPLETED);
+                                }
                             }
-                        }
-                ));
+                    )
+                );
                 nWorkingThreads.incrementAndGet();
             }
         }
@@ -132,7 +138,7 @@ public class BooksLoaderAndDecoder {
                 }
                 updatedResult.add(book.withRelatedBookIds(relatedIds));
 
-                Log.d("RELATIONS", "\t<--- processed \"%s\". relations - %s", book.title(), relatedIds);
+                Log.d(TAG_RELATIONS, "\t<--- processed \"%s\". relations - %s", book.title(), relatedIds);
             }
             result.clear();
             result.addAll(updatedResult);
