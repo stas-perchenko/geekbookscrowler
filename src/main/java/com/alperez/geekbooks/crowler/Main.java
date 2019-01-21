@@ -83,7 +83,7 @@ public class Main {
             Collection<BookModel> books = booksDecoder.getDecodedBooks();
 
 
-
+            //----  Fing related PDF files for books  ----
             File destinationDir = new File(argDestBooksFolder);
             FileUtils.createDirIfNeeded(destinationDir);
             FileUtils.clearFolder(destinationDir);
@@ -92,9 +92,19 @@ public class Main {
 
 
 
+            //----  Save result to database  ----
+            // load the sqlite-JDBC driver using the current class loader
+            Class.forName("org.sqlite.JDBC");
+
+
+
+
             //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         } catch (IOException | InterruptedException e) {
+            e.printStackTrace(System.out);
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }
