@@ -11,7 +11,6 @@ import com.sun.javafx.UnmodifiableArrayList;
 import java.awt.geom.Dimension2D;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 
 @AutoValue
@@ -21,8 +20,10 @@ public abstract class BookModel {
     public abstract URL imagePath();
     @Nullable
     public abstract Dimension2D imageDimensions();
-    public abstract URL pdfPath();
+    public abstract URL origPdfPath();
     public abstract Float pdfSize();
+    @Nullable
+    public abstract String finPdfFileName();
     @Nullable
     public abstract String isbn();
     @Nullable
@@ -70,8 +71,9 @@ public abstract class BookModel {
         public abstract Builder setGeekBooksAddress(URL geekBooksAddress);
         public abstract Builder setImagePath(@Nullable URL imagePath);
         public abstract Builder setImageDimensions(@Nullable Dimension2D imageDimensions);
-        public abstract Builder setPdfPath(URL pdfPath);
+        public abstract Builder setOrigPdfPath(URL pdfPath);
         public abstract Builder setPdfSize(Float pdfSize);
+        public abstract Builder setFinPdfFileName(@Nullable String finPdfFileName);
         public abstract Builder setIsbn(@Nullable String isbn);
         public abstract Builder setAsin(@Nullable String asin);
         public abstract Builder setTitle(String title);
@@ -105,7 +107,7 @@ public abstract class BookModel {
                 .setGeekBooksAddress(geekBooksAddress())
                 .setImagePath(imagePath())
                 .setImageDimensions(imageDimensions())
-                .setPdfPath(pdfPath())
+                .setOrigPdfPath(origPdfPath())
                 .setPdfSize(pdfSize())
                 .setIsbn(isbn())
                 .setAsin(asin())

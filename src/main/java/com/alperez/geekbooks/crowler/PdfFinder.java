@@ -28,17 +28,18 @@ public final class PdfFinder {
         return this;
     }
 
-    public void findAndCopy() {
+    public Map<Long, String> findAndCopy() {
         if(destinationDir == null) throw new IllegalStateException("The toFolder() was not called");
 
         Map<String, String[]> mapFoldersFiles = new HashMap<>(100);
         Set<String> setNonExistedFolders = new HashSet<>(100);
 
 
+        Map<Long, String> result = new HashMap<>();
         for (BookModel b : books) {
             Log.d("\r\n\r\n\r\nBOOK", "--->  Evaluate book - "+b.title());
             Log.d("BOOK_CATEGORY", b.category().toString());
-            Log.d("PDF_PATH", b.pdfPath().toString());
+            Log.d("PDF_PATH", b.origPdfPath().toString());
 
             String folder = getFolder(b);
             String fName  = getFileName(b);
@@ -102,10 +103,12 @@ public final class PdfFinder {
                 File fDst = new File(destinationDir, hash);
                 Log.d("COPY", fSrc.getAbsolutePath()+"   to   "+fDst.getAbsolutePath());
                 FileUtils.copyFileToFile(fTmp, fDst);
+                result.put(b.id(), hash);
             } catch (Exception e) {
                 e.printStackTrace(System.out);
             }
         } //for()
+        return result;
     }
 
 
@@ -115,7 +118,7 @@ public final class PdfFinder {
     }
 
     private String getFileName(BookModel book) {
-        String path = book.pdfPath().getPath();
+        String path = book.origPdfPath().getPath();
         return path.substring(path.lastIndexOf('/')+1);
     }
 

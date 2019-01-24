@@ -2,6 +2,7 @@ package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.storage.BookDbSaver;
 import com.alperez.geekbooks.crowler.utils.FileUtils;
 import com.alperez.geekbooks.crowler.utils.Log;
 
@@ -11,6 +12,7 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -90,12 +92,13 @@ public class Main {
             PdfFinder.forBooks(books).toFolder(destinationDir).findAndCopy();
 
 
-
-
             //----  Save result to database  ----
             // load the sqlite-JDBC driver using the current class loader
             Class.forName("org.sqlite.JDBC");
-
+            BookDbSaver saver = new BookDbSaver(argDestDbName);
+            for (BookModel b : books) {
+                saver.saveBook(b);
+            }
 
 
 
@@ -105,6 +108,10 @@ public class Main {
             e.printStackTrace(System.out);
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
+            e.printStackTrace(System.out);
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            //TODO Log SQL error
             e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }

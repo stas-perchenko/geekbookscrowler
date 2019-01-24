@@ -327,7 +327,7 @@ public class BookItemProcessor implements Runnable {
         } catch (Exception e) {
             throw new JSONException("Cannot extract file size from the Download button title - "+title, e);
         }
-        dst.setPdfPath(getUrlFromPath(jBtn.getString("href")));
+        dst.setOrigPdfPath(getUrlFromPath(jBtn.getString("href")));
     }
 
     private void decodeFieldsSection(@NonNull JSONObject jObj, @NonNull BookModel.Builder dst) throws JSONException {
