@@ -1,5 +1,6 @@
-package com.alperez.geekbooks.crowler.storage;
+package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.TagModel;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -27,5 +28,9 @@ public class TagsDAO {
 
     public void dropTable() throws SQLException {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    public TagModel insertTag(String tagTitle) {
+
     }
 }

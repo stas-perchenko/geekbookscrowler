@@ -1,6 +1,7 @@
 package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookModel;
+import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.utils.FileUtils;
 import com.alperez.geekbooks.crowler.utils.Log;
 import com.alperez.geekbooks.crowler.utils.NonNull;
@@ -28,14 +29,14 @@ public final class PdfFinder {
         return this;
     }
 
-    public Map<Long, String> findAndCopy() {
+    public Map<LongId<BookModel>, String> findAndCopy() {
         if(destinationDir == null) throw new IllegalStateException("The toFolder() was not called");
 
         Map<String, String[]> mapFoldersFiles = new HashMap<>(100);
         Set<String> setNonExistedFolders = new HashSet<>(100);
 
 
-        Map<Long, String> result = new HashMap<>();
+        Map<LongId<BookModel>, String> result = new HashMap<>();
         for (BookModel b : books) {
             Log.d("\r\n\r\n\r\nBOOK", "--->  Evaluate book - "+b.title());
             Log.d("BOOK_CATEGORY", b.category().toString());

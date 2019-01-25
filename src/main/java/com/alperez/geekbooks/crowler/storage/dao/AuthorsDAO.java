@@ -1,5 +1,7 @@
-package com.alperez.geekbooks.crowler.storage;
+package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.AuthorModel;
+import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -31,5 +33,9 @@ public class AuthorsDAO {
 
     public void dropTable() throws SQLException {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    public AuthorModel insertAuthor(AuthorModel author) {
+        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 }

@@ -8,7 +8,7 @@ import com.google.auto.value.AutoValue;
 import java.io.UnsupportedEncodingException;
 
 @AutoValue
-public abstract class BookCategoryModel implements Cloneable {
+public abstract class BookCategoryModel implements IdProvidingModel, Cloneable {
     public abstract int level();
     public abstract String title();
     @Nullable
@@ -21,16 +21,17 @@ public abstract class BookCategoryModel implements Cloneable {
                 ? String.format("%d:%s", level, title)
                 : String.format("%d:%d:%s", parent.id(), level, title);
         try {
-            instance.id = SipHash.calculateHash(key, hashText.getBytes("UTF-8")) >>> 1;
+            long idValue = SipHash.calculateHash(key, hashText.getBytes("UTF-8")) >>> 1;
+            instance.id = LongId.valueOf(idValue);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
         return instance;
     }
 
-    private long id;
+    private LongId<BookCategoryModel> id;
 
-    public long id() {
+    public LongId<BookCategoryModel> id() {
         return id;
     }
 

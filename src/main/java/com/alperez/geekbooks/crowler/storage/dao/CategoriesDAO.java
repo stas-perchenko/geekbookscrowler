@@ -1,5 +1,6 @@
-package com.alperez.geekbooks.crowler.storage;
+package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.BookCategoryModel;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -33,5 +34,9 @@ public class CategoriesDAO {
 
     public void dropTable() throws SQLException {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    public void insertCategory(BookCategoryModel category) throws SQLException {
+        sdfgkjd
     }
 }

@@ -2,6 +2,7 @@ package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.BookModel;
 import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.utils.Log;
 import com.alperez.geekbooks.crowler.utils.NonNull;
 
@@ -125,7 +126,7 @@ public class BooksLoaderAndDecoder {
         synchronized (result) {
             List<BookModel> updatedResult = new ArrayList<>(result.size());
             for (BookModel book : result) {
-                List<Long> relatedIds = new ArrayList<>(10);
+                List<LongId<BookModel>> relatedIds = new ArrayList<>(10);
 
                 for (Iterator<Map<String, Object>> itr = relations.iterator(); itr.hasNext(); ) {
                     Map<String, Object> relItem = itr.next();
@@ -145,7 +146,7 @@ public class BooksLoaderAndDecoder {
         }
     }
 
-    private void mapBookURLsToIds(@NonNull List<URL> relatedURLs, @NonNull List<Long> relatedIds) {
+    private void mapBookURLsToIds(@NonNull List<URL> relatedURLs, @NonNull List<LongId<BookModel>> relatedIds) {
         synchronized (result) {
             for (URL u : relatedURLs) {
                 for (BookModel book : result) {

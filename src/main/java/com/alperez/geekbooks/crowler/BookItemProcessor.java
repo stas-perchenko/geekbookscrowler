@@ -1,10 +1,6 @@
 package com.alperez.geekbooks.crowler;
 
-import com.alperez.geekbooks.crowler.data.AuthorModel;
-import com.alperez.geekbooks.crowler.data.BookCategoryModel;
-import com.alperez.geekbooks.crowler.data.BookModel;
-import com.alperez.geekbooks.crowler.data.BookRefItem;
-import com.alperez.geekbooks.crowler.data.TagModel;
+import com.alperez.geekbooks.crowler.data.*;
 import com.alperez.geekbooks.crowler.utils.*;
 //import com.alperez.geekbooks.crowler.utils.Log;
 import org.json.JSONArray;
@@ -411,7 +407,7 @@ public class BookItemProcessor implements Runnable {
                 for (int i=0; i < jArr.length(); i++) {
                     JSONObject jTag = jArr.getJSONObject(i);
                     if (jTag.getString("class").equals("tag") && jTag.has("content")) {
-                        tags.add(TagModel.create(0, jTag.getString("content")));
+                        tags.add(TagModel.create(null, jTag.getString("content")));
                     }
                 }
             }

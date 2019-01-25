@@ -6,14 +6,15 @@ import com.alperez.geekbooks.crowler.storage.BookDbSaver;
 import com.alperez.geekbooks.crowler.utils.FileUtils;
 import com.alperez.geekbooks.crowler.utils.Log;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -22,43 +23,6 @@ public class Main {
     private static Integer argNThreads;
     private static String argDestBooksFolder;
     private static String argDestDbName;
-
-
-    private static void extractArguments(String[] args) throws MalformedURLException {
-        for (String arg : args) {
-            int delimIndex = arg.indexOf('=');
-            if (delimIndex <= 0) throw new IllegalArgumentException("Wrong argument - "+arg);
-            String value = arg.substring(delimIndex + 1);
-            switch (arg.substring(0, delimIndex)) {
-                case "url":
-                    argUrl = new URL(value);
-                    break;
-                case "nThreads":
-                    argNThreads = Integer.parseInt(value);
-                    break;
-                case "dstBooks":
-                    if (value.length() == 0) throw new IllegalArgumentException("Missing argument value - dstBooks");
-                    argDestBooksFolder = value;
-                    break;
-                case "dbName":
-                    if (value.length() == 0) throw new IllegalArgumentException("Missing argument value - dbName");
-                    argDestDbName = value;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown argument - " + arg.substring(0, delimIndex));
-            }
-
-            if (argNThreads == null) argNThreads = 1;
-
-            if (argUrl == null) {
-                throw new IllegalArgumentException("Missing argument - url");
-            } else if (argDestBooksFolder == null) {
-                throw new IllegalArgumentException("Missing argument - dstBooks");
-            } else if (argDestDbName == null) {
-                throw new IllegalArgumentException("Missing argument - dbName");
-            }
-        }
-    }
 
     public static void main(String[] args) {
         try {
@@ -97,7 +61,7 @@ public class Main {
             Class.forName("org.sqlite.JDBC");
             BookDbSaver saver = new BookDbSaver(argDestDbName);
             for (BookModel b : books) {
-                saver.saveBook(b);
+                saver.insertBook(b);
             }
 
 
@@ -121,7 +85,41 @@ public class Main {
 
 
 
+    private static void extractArguments(String[] args) throws MalformedURLException {
+        for (String arg : args) {
+            int delimIndex = arg.indexOf('=');
+            if (delimIndex <= 0) throw new IllegalArgumentException("Wrong argument - "+arg);
+            String value = arg.substring(delimIndex + 1);
+            switch (arg.substring(0, delimIndex)) {
+                case "url":
+                    argUrl = new URL(value);
+                    break;
+                case "nThreads":
+                    argNThreads = Integer.parseInt(value);
+                    break;
+                case "dstBooks":
+                    if (value.length() == 0) throw new IllegalArgumentException("Missing argument value - dstBooks");
+                    argDestBooksFolder = value;
+                    break;
+                case "dbName":
+                    if (value.length() == 0) throw new IllegalArgumentException("Missing argument value - dbName");
+                    argDestDbName = value;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown argument - " + arg.substring(0, delimIndex));
+            }
 
+            if (argNThreads == null) argNThreads = 1;
+
+            if (argUrl == null) {
+                throw new IllegalArgumentException("Missing argument - url");
+            } else if (argDestBooksFolder == null) {
+                throw new IllegalArgumentException("Missing argument - dstBooks");
+            } else if (argDestDbName == null) {
+                throw new IllegalArgumentException("Missing argument - dbName");
+            }
+        }
+    }
 
 
 

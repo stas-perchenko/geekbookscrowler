@@ -9,7 +9,7 @@ import com.google.auto.value.AutoValue;
 import java.io.UnsupportedEncodingException;
 
 @AutoValue
-public abstract class AuthorModel {
+public abstract class AuthorModel implements IdProvidingModel {
     @Nullable
     public abstract String name();
     public abstract String familyName();
@@ -18,9 +18,9 @@ public abstract class AuthorModel {
         return TextUtils.isEmpty(name()) ? familyName() : String.format("%s %s", name(), familyName());
     }
 
-    private long id;
+    private LongId<AuthorModel> id;
 
-    public long id() {
+    public LongId<AuthorModel> id() {
         return id;
     }
 
@@ -41,7 +41,8 @@ public abstract class AuthorModel {
             AuthorModel instance = actualBuild();
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-123, -82, 6, -17, -105, 33, 71, 113, -101, 121, -29, -71, 33, 107, 6, -97});
             try {
-                instance.id = SipHash.calculateHash(key, String.format("%s:%s", instance.name(), instance.familyName()).getBytes("UTF-8")) >>> 1;
+                long idValue = SipHash.calculateHash(key, String.format("%s:%s", instance.name(), instance.familyName()).getBytes("UTF-8")) >>> 1;
+                instance.id = LongId.valueOf(idValue);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

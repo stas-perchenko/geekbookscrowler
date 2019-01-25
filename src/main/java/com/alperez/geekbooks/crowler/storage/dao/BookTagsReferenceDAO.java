@@ -1,5 +1,8 @@
-package com.alperez.geekbooks.crowler.storage;
+package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.BookModel;
+import com.alperez.geekbooks.crowler.data.LongId;
+import com.alperez.geekbooks.crowler.data.TagModel;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -27,5 +30,9 @@ public class BookTagsReferenceDAO {
 
     public void dropTable() throws SQLException {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    public void insertRelation(LongId<BookModel> bookId, LongId<TagModel> tagId) throws SQLException {
+        sjkdfkgdfg
     }
 }

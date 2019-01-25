@@ -1,4 +1,4 @@
-package com.alperez.geekbooks.crowler.storage;
+package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 

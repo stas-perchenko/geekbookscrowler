@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.List;
 
 @AutoValue
-public abstract class BookModel {
+public abstract class BookModel implements IdProvidingModel {
     public abstract URL geekBooksAddress();
     @Nullable
     public abstract URL imagePath();
@@ -37,11 +37,11 @@ public abstract class BookModel {
     public abstract String description();
     public abstract List<TagModel> tags();
     public abstract BookCategoryModel category();
-    public abstract List<Long> relatedBookIds();
+    public abstract List<LongId<BookModel>> relatedBookIds();
 
-    private long id;
+    private LongId<BookModel> id;
 
-    public long id() {
+    public LongId<BookModel> id() {
         return id;
     }
 
@@ -84,13 +84,14 @@ public abstract class BookModel {
         public abstract Builder setDescription(String description);
         public abstract Builder setTags(List<TagModel> tags);
         public abstract Builder setCategory(BookCategoryModel category);
-        public abstract Builder setRelatedBookIds(List<Long> relatedBookIds);
+        public abstract Builder setRelatedBookIds(List<LongId<BookModel>> relatedBookIds);
         abstract BookModel actualBuild();
         public BookModel build() {
             BookModel instance = actualBuild();
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-20, 109, -21, 99, -27, 19, -51, 96, 71, 31, 96, -34, 1, -83, 3, 117});
             try {
-                instance.id = SipHash.calculateHash(key, instance.getIdHashText().getBytes("UTF-8")) >>> 1;
+                long idValue = SipHash.calculateHash(key, instance.getIdHashText().getBytes("UTF-8")) >>> 1;
+                instance.id = LongId.valueOf(idValue);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -99,8 +100,7 @@ public abstract class BookModel {
 
     }
 
-    public BookModel withRelatedBookIds(@NonNull List<Long> ids) {
-        Long id_arr[] = ids.toArray(new Long[ids.size()]);
+    public BookModel withRelatedBookIds(@NonNull List<LongId<BookModel>> ids) {
         AuthorModel new_authors[] = authors().toArray(new AuthorModel[authors().size()]);
         TagModel new_tags[] = tags().toArray(new TagModel[tags().size()]);
         return builder()
@@ -119,7 +119,7 @@ public abstract class BookModel {
                 .setDescription(description())
                 .setTags(new UnmodifiableArrayList<>(new_tags, new_tags.length))
                 .setCategory(category().clone())
-                .setRelatedBookIds(new UnmodifiableArrayList<>(id_arr, id_arr.length))
+                .setRelatedBookIds(ids)
                 .build();
 
     }
