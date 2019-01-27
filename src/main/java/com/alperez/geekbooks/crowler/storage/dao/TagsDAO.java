@@ -2,7 +2,6 @@ package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.data.TagModel;
-import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;

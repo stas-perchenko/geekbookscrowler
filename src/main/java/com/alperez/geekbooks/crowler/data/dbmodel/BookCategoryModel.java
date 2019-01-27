@@ -21,7 +21,7 @@ public abstract class BookCategoryModel implements IdProvidingModel, Cloneable {
         SipHashKey key = SipHashKey.ofBytes(new byte[]{76, 94, -111, 24, 73, -81, -6, -101, 8, 116, 78, 113, 105, 67, 108, -15});
         String hashText = (parent == null)
                 ? String.format("%d:%s", level, title)
-                : String.format("%d:%d:%s", parent.id(), level, title);
+                : String.format("%s:%d:%s", parent.id(), level, title);
         try {
             long idValue = SipHash.calculateHash(key, hashText.getBytes("UTF-8")) >>> 1;
             instance.id = LongId.valueOf(idValue);

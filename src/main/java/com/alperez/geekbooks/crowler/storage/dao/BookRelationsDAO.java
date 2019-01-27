@@ -8,10 +8,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class BookRelationsDAO {
-    private static final String TABLE_NAME = "Authors";
+    private static final String TABLE_NAME = "BookRelations";
     private static final String COLUMN_HOST_BOOK_ID   = "host_book_id";
     private static final String COLUMN_DEPEND_BOOK_ID = "depend_book_id";
-    private static final String COLUMN_ORDER = "order";
+    private static final String COLUMN_ORDER = "_order_";
 
     private final DbExecutor executor;
 

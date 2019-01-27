@@ -13,7 +13,7 @@ public class BookTagsReferenceDAO {
     private static final String TABLE_NAME = "BooksTags";
     private static final String COLUMN_BOOK_ID = "book_id";
     private static final String COLUMN_TAG_ID = "tag_id";
-    private static final String COLUMN_ORDER = "order";
+    private static final String COLUMN_ORDER = "_order_";
 
 
     private final DbExecutor executor;

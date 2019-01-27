@@ -23,6 +23,7 @@ public class Main {
     private static Integer argNThreads;
     private static String argDestBooksFolder;
     private static String argDestDbName;
+    private static Integer argMaxBook;
 
     public static void main(String[] args) {
         try {
@@ -38,18 +39,17 @@ public class Main {
             printAllFoundBookReferences(refs);
 
 
-            List<BookRefItem> dbgRefs = new ArrayList<>(300);
-            for (int i=0; i<300; i++) dbgRefs.add(  (BookRefItem) ((List) refs).get(i)  );
+
 
 
             URL host = new URL(String.format("%s://%s", argUrl.getProtocol(), argUrl.getHost()));
-            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, dbgRefs, argNThreads);
+            BooksLoaderAndDecoder booksDecoder = new BooksLoaderAndDecoder(host, (argMaxBook == null) ? refs : limitBooks(refs, argMaxBook), argNThreads);
             booksDecoder.start();
             booksDecoder.join(45, TimeUnit.MINUTES);
             Collection<BookModel> books = booksDecoder.getDecodedBooks();
 
 
-            //----  Fing related PDF files for books  ----
+            //----  Find related PDF files for books  ----
             File destinationDir = new File(argDestBooksFolder);
             FileUtils.createDirIfNeeded(destinationDir);
             FileUtils.clearFolder(destinationDir);
@@ -58,8 +58,11 @@ public class Main {
 
             //----  Save result to database  ----
             // load the sqlite-JDBC driver using the current class loader
+            System.out.println(String.format("\n\n===============================  Start saving decoded Books into the local DB - %s  =====================================", argDestDbName));
             Class.forName("org.sqlite.JDBC");
             BookDbSaver saver = new BookDbSaver(argDestDbName);
+            //saver.dropAllTables();
+            saver.createTables();
             for (BookModel b : books) {
                 try {
                     saver.insertBook(b);
@@ -71,8 +74,6 @@ public class Main {
 
 
             //----  Select and Log-out all books for test purpose  ----
-
-
             //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         } catch (IOException | InterruptedException e) {
@@ -82,7 +83,11 @@ public class Main {
             e.printStackTrace(System.out);
             throw new RuntimeException(e);
         } catch (SQLException e) {
-            //TODO Log SQL error
+            Log.d("MAIN", "<~~~  Top-level SQLException - "+e.getMessage());
+            e.printStackTrace(System.out);
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            Log.d("MAIN", "<~~~  Top-level Exception - "+e.getMessage());
             e.printStackTrace(System.out);
             throw new RuntimeException(e);
         }
@@ -112,23 +117,23 @@ public class Main {
                     if (value.length() == 0) throw new IllegalArgumentException("Missing argument value - dbName");
                     argDestDbName = value;
                     break;
+                case "maxBooks":
+                    argMaxBook = Integer.parseInt(value);
+                    break;
                 default:
                     throw new IllegalArgumentException("Unknown argument - " + arg.substring(0, delimIndex));
             }
+        }
+        if (argNThreads == null) argNThreads = 1;
 
-            if (argNThreads == null) argNThreads = 1;
-
-            if (argUrl == null) {
-                throw new IllegalArgumentException("Missing argument - url");
-            } else if (argDestBooksFolder == null) {
-                throw new IllegalArgumentException("Missing argument - dstBooks");
-            } else if (argDestDbName == null) {
-                throw new IllegalArgumentException("Missing argument - dbName");
-            }
+        if (argUrl == null) {
+            throw new IllegalArgumentException("Missing argument - url");
+        } else if (argDestBooksFolder == null) {
+            throw new IllegalArgumentException("Missing argument - dstBooks");
+        } else if (argDestDbName == null) {
+            throw new IllegalArgumentException("Missing argument - dbName");
         }
     }
-
-
 
 
 
@@ -141,7 +146,14 @@ public class Main {
     }
 
 
-
+    private static Collection<BookRefItem> limitBooks(Collection<BookRefItem> refs, int max) {
+        int finZise = Math.min(refs.size(), max);
+        List<BookRefItem> result = new ArrayList<>(finZise);
+        for (int i=0; i<finZise; i++) {
+            result.add(  (BookRefItem) ((List) refs).get(i)  );
+        }
+        return result;
+    }
 
 
 }
