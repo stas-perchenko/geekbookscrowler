@@ -1,7 +1,7 @@
 package com.alperez.geekbooks.crowler;
 
-import com.alperez.geekbooks.crowler.data.BookModel;
-import com.alperez.geekbooks.crowler.data.BookRefItem;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
+import com.alperez.geekbooks.crowler.data.parsing.BookRefItem;
 import com.alperez.geekbooks.crowler.storage.BookDbSaver;
 import com.alperez.geekbooks.crowler.utils.FileUtils;
 import com.alperez.geekbooks.crowler.utils.Log;

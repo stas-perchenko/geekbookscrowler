@@ -1,6 +1,9 @@
 package com.alperez.geekbooks.crowler.storage;
 
 import com.alperez.geekbooks.crowler.data.*;
+import com.alperez.geekbooks.crowler.data.dbmodel.AuthorModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
 import com.alperez.geekbooks.crowler.storage.dao.*;
 import com.alperez.geekbooks.crowler.utils.NonNull;
 import com.alperez.geekbooks.crowler.utils.TextUtils;
@@ -147,7 +150,7 @@ public final class BookDbSaver implements Closeable {
 
 
 
-            
+
         }
     }
 

@@ -1,6 +1,6 @@
 package com.alperez.geekbooks.crowler.parser;
 
-import com.alperez.geekbooks.crowler.data.CategoryItem;
+import com.alperez.geekbooks.crowler.data.parsing.CategoryItem;
 import com.alperez.geekbooks.crowler.utils.Log;
 import org.json.JSONArray;
 import org.json.JSONException;

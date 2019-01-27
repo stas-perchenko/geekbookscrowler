@@ -1,5 +1,8 @@
-package com.alperez.geekbooks.crowler.data;
+package com.alperez.geekbooks.crowler.data.dbmodel;
 
+import com.alperez.geekbooks.crowler.data.IdProvidingModel;
+import com.alperez.geekbooks.crowler.data.LongId;
+import com.alperez.geekbooks.crowler.data.TagModel;
 import com.alperez.geekbooks.crowler.utils.NonNull;
 import com.alperez.geekbooks.crowler.utils.Nullable;
 import com.alperez.geekbooks.crowler.utils.TextUtils;

@@ -1,26 +1,21 @@
-package com.alperez.geekbooks.crowler.data;
+package com.alperez.geekbooks.crowler.data.parsing;
 
 import java.net.URL;
 
-public class CategoryItem {
-
+public class BookRefItem {
     private final String title;
     private final URL url;
-    private final int nBooks;
 
     private final int hashCode;
     private final String text;
 
-
-
-
-    public CategoryItem(String title, URL url, int nBooks) {
+    public BookRefItem(String title, URL url) {
         this.title = title;
         this.url = url;
-        this.nBooks = nBooks;
 
-        hashCode = (text = String.format("{title=%s, count=%d, link=%s}", title, nBooks,url.toString())).hashCode();
+        hashCode = (text = String.format("{title=%s, link=%s}", title, url.toString())).hashCode();
     }
+
 
     public String getTitle() {
         return title;
@@ -28,10 +23,6 @@ public class CategoryItem {
 
     public URL getUrl() {
         return url;
-    }
-
-    public int getNBooks() {
-        return nBooks;
     }
 
     @Override

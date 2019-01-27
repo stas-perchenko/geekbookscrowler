@@ -1,6 +1,6 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
-import com.alperez.geekbooks.crowler.data.BookCategoryModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -37,6 +37,6 @@ public class CategoriesDAO {
     }
 
     public void insertCategory(BookCategoryModel category) throws SQLException {
-        sdfgkjd
+        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 }

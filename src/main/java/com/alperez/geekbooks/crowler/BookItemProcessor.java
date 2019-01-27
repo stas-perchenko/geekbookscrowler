@@ -1,6 +1,10 @@
 package com.alperez.geekbooks.crowler;
 
 import com.alperez.geekbooks.crowler.data.*;
+import com.alperez.geekbooks.crowler.data.dbmodel.AuthorModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
+import com.alperez.geekbooks.crowler.data.parsing.BookRefItem;
 import com.alperez.geekbooks.crowler.utils.*;
 //import com.alperez.geekbooks.crowler.utils.Log;
 import org.json.JSONArray;

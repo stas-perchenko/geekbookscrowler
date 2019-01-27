@@ -1,7 +1,7 @@
 package com.alperez.geekbooks.crowler;
 
-import com.alperez.geekbooks.crowler.data.BookRefItem;
-import com.alperez.geekbooks.crowler.data.CategoryItem;
+import com.alperez.geekbooks.crowler.data.parsing.BookRefItem;
+import com.alperez.geekbooks.crowler.data.parsing.CategoryItem;
 import com.alperez.geekbooks.crowler.parser.BookListPageParser;
 import com.alperez.geekbooks.crowler.utils.*;
 import org.json.JSONException;

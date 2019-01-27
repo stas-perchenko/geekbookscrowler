@@ -31,6 +31,7 @@ public class TagsDAO {
     }
 
     public TagModel insertTag(String tagTitle) {
-
+        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        return null;
     }
 }

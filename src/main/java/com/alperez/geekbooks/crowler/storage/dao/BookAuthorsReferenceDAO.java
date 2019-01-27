@@ -1,7 +1,7 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
-import com.alperez.geekbooks.crowler.data.AuthorModel;
-import com.alperez.geekbooks.crowler.data.BookModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.AuthorModel;
+import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
 import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
@@ -34,6 +34,5 @@ public class BookAuthorsReferenceDAO {
 
     public void insertRelation(LongId<BookModel> bookId, LongId<AuthorModel> authId) throws SQLException {
         //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        fgdfgdfg
     }
 }
