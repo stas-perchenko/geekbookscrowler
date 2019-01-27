@@ -1,6 +1,8 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.data.TagModel;
+import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -31,7 +33,8 @@ public class TagsDAO {
     }
 
     public TagModel insertTag(String tagTitle) throws SQLException {
-        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        return null;
+        String sql = String.format("INSERT INTO %s (%s) VALUES ('%s');", TABLE_NAME, COLUMN_TITLE, tagTitle);
+        long id = executor.execUpdate(sql);
+        return TagModel.create(LongId.valueOf(id), tagTitle);
     }
 }

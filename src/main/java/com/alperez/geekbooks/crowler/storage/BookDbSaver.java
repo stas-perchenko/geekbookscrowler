@@ -5,6 +5,7 @@ import com.alperez.geekbooks.crowler.data.dbmodel.AuthorModel;
 import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
 import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
 import com.alperez.geekbooks.crowler.storage.dao.*;
+import com.alperez.geekbooks.crowler.utils.Log;
 import com.alperez.geekbooks.crowler.utils.NonNull;
 import com.alperez.geekbooks.crowler.utils.TextUtils;
 
@@ -15,6 +16,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public final class BookDbSaver implements Closeable {
+    public static final String LOG_TAG = "DB_SAVE";
 
     private final Connection mConnection;
     private boolean isClosed;
@@ -112,38 +114,65 @@ public final class BookDbSaver implements Closeable {
         BookRelationsDAO bookRelDao = new BookRelationsDAO(mConnection);
         BooksDAO bookDao = new BooksDAO(mConnection);
         synchronized (mConnection) {
+            int order;
 
             //----  Save Authors and book-author relations for a book  ----
+            order = 0;
             for (AuthorModel auth : book.authors()) {
-                if (!authorsCache.contains(auth)) authorsCache.put(authDao.insertAuthor(auth));
+                if (!authorsCache.contains(auth)) {
+                    try {
+                        authorsCache.put(authDao.insertAuthor(auth));
+                        Log.d(LOG_TAG, "Author has been inserted - %s;", auth);
+                    } catch (SQLException e) {
+                        Log.d(LOG_TAG, "<~~~ Error insert Author %s - %s", auth, e.getMessage());
+                        e.printStackTrace(System.out);
+                    }
+                }
                 try {
-                    bookAuthDao.insertRelation(book.id(), auth.id());
-                } catch (SQLException e) {}
+                    bookAuthDao.insertRelation(book.id(), auth.id(), order++);
+                } catch (SQLException e) {
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-Author relation (%s : %s) - %s", book, auth, e.getMessage());
+                    e.printStackTrace(System.out);
+                }
             }
 
             //----  Save Tags and book-tags relations for a book  ----
+            order = 0;
             for (TagModel tag : book.tags()) {
                 LongId<TagModel> tagId = tag.id();
                 if ((tagId == null) || (tagId.getValue() <= 0)) {
                     TagModel existingTag = tagssCache.getFirstEqualsItem(item -> item.title().equals(tag.title()));
                     if (existingTag == null) {
-                        existingTag = tagDao.insertTag(tag.title());
-                        tagssCache.put(existingTag);
+                        try {
+                            existingTag = tagDao.insertTag(tag.title());
+                            Log.d(LOG_TAG, "<--- Tag '%s' has been saved - %s;", tag.title(), existingTag.toString());
+                            tagssCache.put(existingTag);
+                        } catch (SQLException e) {
+                            Log.d(LOG_TAG, "<~~~ Error insert Tag %s - %s", tag.title(), e.getMessage());
+                            e.printStackTrace(System.out);
+                        }
                     }
                     tagId = existingTag.id();
                 }
                 try {
-                    bookTagDao.insertRelation(book.id(), tagId);
-                } catch (SQLException e) { }
+                    bookTagDao.insertRelation(book.id(), tagId, order++);
+                } catch (SQLException e) {
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-Tag relation (%s : %s) - %s", book, tag.title(), e.getMessage());
+                    e.printStackTrace(System.out);
+                }
             }
 
-            //----  Save category book-category relation to a book  ----
+            //----  Check if Book Category exists, save if it doesn't  ----
             BookCategoryModel categ = book.category();
             do {
                 if (!categoryCache.contains(categ)) {
                     try {
                         categDao.insertCategory(categ);
-                    } catch (SQLException e) { }
+                        Log.d(LOG_TAG, "<--- New book Category has been inserted - %s;", categ);
+                    } catch (SQLException e) {
+                        Log.d(LOG_TAG, "<~~~ Error insert category %s - %s", categ, e.getMessage());
+                        e.printStackTrace(System.out);
+                    }
                     categoryCache.put(categ);
                 }
                 categ = categ.parent();
@@ -151,13 +180,23 @@ public final class BookDbSaver implements Closeable {
 
             //----  Save book-to-book relations for a book  ----
             bookRelDao.removeReferencesForBooks(book.id());
-            int order = 0;
+            order = 0;
             for (LongId<BookModel> relId : book.relatedBookIds()) {
-                bookRelDao.insertBookRelation(book, relId, order++);
+                try {
+                    bookRelDao.insertBookRelation(book, relId, order++);
+                } catch (SQLException e) {
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-to-Book relation (%s : %s) - %s", book, relId, e.getMessage());
+                    throw e;
+                }
             }
 
             //----  Save Book entity  ----
-            bookDao.createOrUpdateBook(book);
+            try {
+                bookDao.createOrUpdateBook(book);
+            } catch (SQLException e) {
+                Log.d(LOG_TAG, "<~~~ Error insert Book entity %s - %s", book, e.getMessage());
+                throw e;
+            }
         }
     }
 

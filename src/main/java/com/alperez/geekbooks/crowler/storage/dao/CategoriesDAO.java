@@ -1,6 +1,7 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
+import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -37,6 +38,11 @@ public class CategoriesDAO {
     }
 
     public void insertCategory(BookCategoryModel category) throws SQLException {
-        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ContentValue cv = new ContentValue();
+        cv.put(COLUMN_ID, category.id().getValue());
+        cv.put(COLUMN_LEVEL, category.level());
+        cv.put(COLUMN_TITLE, category.title());
+        if (category.parent() != null) cv.put(COLUMN_PARENT_ID, category.parent().id().getValue());
+        executor.execInsert(TABLE_NAME, cv);
     }
 }

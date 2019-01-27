@@ -1,6 +1,7 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.dbmodel.AuthorModel;
+import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -34,8 +35,12 @@ public class AuthorsDAO {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
     }
 
-    public AuthorModel insertAuthor(AuthorModel author) {
-        //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        return null;
+    public AuthorModel insertAuthor(AuthorModel author) throws SQLException {
+        ContentValue cv = new ContentValue();
+        cv.put(COLUMN_ID, author.id().getValue());
+        cv.put(COLUMN_FAMILY_NAME, author.familyName());
+        if (author.name() != null) cv.put(COLUMN_NAME, author.name());
+        executor.execInsert(TABLE_NAME, cv);
+        return author;
     }
 }

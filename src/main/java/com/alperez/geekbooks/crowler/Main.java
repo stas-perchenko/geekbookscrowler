@@ -70,6 +70,8 @@ public class Main {
             }
 
 
+            //----  Select and Log-out all books for test purpose  ----
+
 
             //TODO Implement further !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

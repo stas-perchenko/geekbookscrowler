@@ -18,6 +18,11 @@ public class LongId<T extends IdProvidingModel> {
     }
 
     @Override
+    public String toString() {
+        return Long.toString(value);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o instanceof LongId) {
             return ((LongId) o).value == this.value;
