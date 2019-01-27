@@ -40,7 +40,7 @@ public abstract class BookModel implements IdProvidingModel {
     public abstract String description();
     public abstract List<TagModel> tags();
     public abstract BookCategoryModel category();
-    public abstract List<LongId<BookRefModel>> relatedBookIds();
+    public abstract List<LongId<BookModel>> relatedBookIds();
     @Nullable
     public abstract List<BookRefModel> relatedBooks();
 

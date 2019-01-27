@@ -102,15 +102,18 @@ public final class BookDbSaver implements Closeable {
     }
 
 
-    public void insertBook(BookModel book) {
+    public void insertBook(BookModel book) throws SQLException {
         if (isClosed()) throw new IllegalStateException("Already closed");
         AuthorsDAO authDao = new AuthorsDAO(mConnection);
         BookAuthorsReferenceDAO bookAuthDao = new BookAuthorsReferenceDAO(mConnection);
         TagsDAO tagDao = new TagsDAO(mConnection);
         BookTagsReferenceDAO bookTagDao = new BookTagsReferenceDAO(mConnection);
         CategoriesDAO categDao = new CategoriesDAO(mConnection);
+        BookRelationsDAO bookRelDao = new BookRelationsDAO(mConnection);
+        BooksDAO bookDao = new BooksDAO(mConnection);
         synchronized (mConnection) {
 
+            //----  Save Authors and book-author relations for a book  ----
             for (AuthorModel auth : book.authors()) {
                 if (!authorsCache.contains(auth)) authorsCache.put(authDao.insertAuthor(auth));
                 try {
@@ -118,6 +121,7 @@ public final class BookDbSaver implements Closeable {
                 } catch (SQLException e) {}
             }
 
+            //----  Save Tags and book-tags relations for a book  ----
             for (TagModel tag : book.tags()) {
                 LongId<TagModel> tagId = tag.id();
                 if ((tagId == null) || (tagId.getValue() <= 0)) {
@@ -133,6 +137,7 @@ public final class BookDbSaver implements Closeable {
                 } catch (SQLException e) { }
             }
 
+            //----  Save category book-category relation to a book  ----
             BookCategoryModel categ = book.category();
             do {
                 if (!categoryCache.contains(categ)) {
@@ -143,6 +148,16 @@ public final class BookDbSaver implements Closeable {
                 }
                 categ = categ.parent();
             } while (categ != null);
+
+            //----  Save book-to-book relations for a book  ----
+            bookRelDao.removeReferencesForBooks(book.id());
+            int order = 0;
+            for (LongId<BookModel> relId : book.relatedBookIds()) {
+                bookRelDao.insertBookRelation(book, relId, order++);
+            }
+
+            //----  Save Book entity  ----
+            bookDao.createOrUpdateBook(book);
 
             //TODO Implement more !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

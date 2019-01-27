@@ -61,7 +61,12 @@ public class Main {
             Class.forName("org.sqlite.JDBC");
             BookDbSaver saver = new BookDbSaver(argDestDbName);
             for (BookModel b : books) {
-                saver.insertBook(b);
+                try {
+                    saver.insertBook(b);
+                } catch (SQLException e) {
+                    //TODO Log this properly
+                    e.printStackTrace(System.out);
+                }
             }
 
 

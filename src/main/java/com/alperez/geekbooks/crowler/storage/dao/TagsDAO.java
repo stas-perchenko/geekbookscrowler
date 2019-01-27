@@ -30,7 +30,7 @@ public class TagsDAO {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
     }
 
-    public TagModel insertTag(String tagTitle) {
+    public TagModel insertTag(String tagTitle) throws SQLException {
         //TODO Implement this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         return null;
     }

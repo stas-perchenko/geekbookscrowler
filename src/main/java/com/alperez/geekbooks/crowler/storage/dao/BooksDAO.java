@@ -1,5 +1,6 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
+import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -57,6 +58,11 @@ public class BooksDAO {
 
     public void dropTable() throws SQLException {
         executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+    }
+
+
+    public void createOrUpdateBook(BookModel book) {
+
     }
 
 }
