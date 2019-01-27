@@ -1,6 +1,7 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
+import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
@@ -61,8 +62,36 @@ public class BooksDAO {
     }
 
 
-    public void createOrUpdateBook(BookModel book) {
+    public void createOrUpdateBook(BookModel book) throws SQLException {
+        ContentValue cv = new ContentValue();
+        cv.put(COLUMN_GEEK_BOOKS_ADRESS, book.geekBooksAddress());
+        if (book.imagePath() != null)
+            cv.put(COLUMN_IMAGE_PATH, book.imagePath());
+        if (book.imageDimensions() != null) {
+            cv.put(COLUMN_IMAGE_WIDTH, book.imageDimensions().getWidth());
+            cv.put(COLUMN_IMAGE_HEIGHT, book.imageDimensions().getHeight());
+        }
+        cv.put(COLUMN_PDF_ORIGINAL_PATH, book.origPdfPath());
+        cv.put(COLUMN_PDF_SIZE, book.pdfSize());
+        if (book.finPdfFileName() != null)
+            cv.put(COLUMN_PDF_FINAL_FILE_NAME, book.finPdfFileName());
+        if (book.isbn() != null)
+            cv.put(COLUMN_ISBN, book.isbn());
+        if (book.asin() != null)
+            cv.put(COLUMN_ASIN, book.asin());
+        cv.put(COLUMN_TITLE, book.title());
+        if (book.subtitle() != null)
+            cv.put(COLUMN_SUBTITLE, book.subtitle());
+        cv.put(COLUMN_YEAR, book.year());
+        cv.put(COLUMN_N_PAGES, book.numPages());
+        cv.put(COLUMN_DESCRIPTION, book.description());
+        cv.put(COLUMN_CATEGORY_ID, book.category().id().getValue());
 
+        String where = String.format("%s = %d", COLUMN_ID, book.id().getValue());
+        if (executor.execUpdate(TABLE_NAME, where, cv) == 0) {
+            cv.put(COLUMN_ID, book.id().getValue());
+            executor.execInsert(TABLE_NAME, cv);
+        }
     }
 
 }

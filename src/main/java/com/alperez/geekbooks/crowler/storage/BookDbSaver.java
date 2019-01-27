@@ -158,16 +158,6 @@ public final class BookDbSaver implements Closeable {
 
             //----  Save Book entity  ----
             bookDao.createOrUpdateBook(book);
-
-            //TODO Implement more !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-
-
-
-
         }
     }
 
