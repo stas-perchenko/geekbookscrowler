@@ -54,6 +54,7 @@ public final class BookDbSaver implements Closeable {
                 new CategoriesDAO(mConnection).dropTable();
                 new BookAuthorsReferenceDAO(mConnection).dropTable();
                 new BookTagsReferenceDAO(mConnection).dropTable();
+                new BookRelationsDAO(mConnection).dropTable();
                 mConnection.commit();
             } catch (SQLException e) {
                 mConnection.rollback();
@@ -76,6 +77,7 @@ public final class BookDbSaver implements Closeable {
                 new CategoriesDAO(mConnection).createTable();
                 new BookAuthorsReferenceDAO(mConnection).createTable();
                 new BookTagsReferenceDAO(mConnection).createTable();
+                new BookRelationsDAO(mConnection).createTable();
                 mConnection.commit();
             } catch (SQLException e) {
                 mConnection.rollback();

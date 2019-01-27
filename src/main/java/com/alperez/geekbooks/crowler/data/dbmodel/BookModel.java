@@ -40,7 +40,9 @@ public abstract class BookModel implements IdProvidingModel {
     public abstract String description();
     public abstract List<TagModel> tags();
     public abstract BookCategoryModel category();
-    public abstract List<LongId<BookModel>> relatedBookIds();
+    public abstract List<LongId<BookRefModel>> relatedBookIds();
+    @Nullable
+    public abstract List<BookRefModel> relatedBooks();
 
     private LongId<BookModel> id;
 
@@ -88,9 +90,21 @@ public abstract class BookModel implements IdProvidingModel {
         public abstract Builder setTags(List<TagModel> tags);
         public abstract Builder setCategory(BookCategoryModel category);
         public abstract Builder setRelatedBookIds(List<LongId<BookModel>> relatedBookIds);
+        public abstract Builder setRelatedBooks(@Nullable List<BookRefModel> relatedBooks);
         abstract BookModel actualBuild();
         public BookModel build() {
             BookModel instance = actualBuild();
+
+            //--- Check related books and related book IDs are the same ---
+            if (instance.relatedBooks() != null) {
+                int i=0;
+                for (BookRefModel bRef : instance.relatedBooks()) {
+                    if (!bRef.id().equals(instance.relatedBookIds().get(i++))) {
+                        throw new IllegalStateException("Lists of related books references and related book IDs are not equal");
+                    }
+                }
+            }
+
             SipHashKey key = SipHashKey.ofBytes(new byte[]{-20, 109, -21, 99, -27, 19, -51, 96, 71, 31, 96, -34, 1, -83, 3, 117});
             try {
                 long idValue = SipHash.calculateHash(key, instance.getIdHashText().getBytes("UTF-8")) >>> 1;
@@ -123,6 +137,7 @@ public abstract class BookModel implements IdProvidingModel {
                 .setTags(new UnmodifiableArrayList<>(new_tags, new_tags.length))
                 .setCategory(category().clone())
                 .setRelatedBookIds(ids)
+                .setRelatedBooks(null)
                 .build();
 
     }
