@@ -1,13 +1,14 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
+import com.alperez.geekbooks.crowler.storage.DbTableManager;
 import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class BooksDAO {
+public class BooksDAO implements DbTableManager {
     private static final String TABLE_NAME = "Books";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_GEEK_BOOKS_ADRESS = "geekBooks_address";
@@ -35,6 +36,7 @@ public class BooksDAO {
         executor = new DbExecutor(connection);
     }
 
+    @Override
     public void createTable() throws SQLException {
         String sql = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY, %s TEXT, %s TEXT, %s INTEGER, %s INTEGER, %s TEXT, %s REAL, %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s TEXT, %s INTEGER, %s INTEGER, %s TEXT, %s INTEGER);",
                 TABLE_NAME,
@@ -54,13 +56,18 @@ public class BooksDAO {
                 COLUMN_N_PAGES,
                 COLUMN_DESCRIPTION,
                 COLUMN_CATEGORY_ID);
-        executor.execUpdate(sql);
+        executor.execUpdateNumAffected(sql);
     }
 
+    @Override
     public void dropTable() throws SQLException {
-        executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+        executor.execUpdateNumAffected(String.format("drop table %s;", TABLE_NAME));
     }
 
+    @Override
+    public boolean isTableExist() throws SQLException {
+        return executor.isTableExist(TABLE_NAME);
+    }
 
     public void createOrUpdateBook(BookModel book) throws SQLException {
         ContentValue cv = new ContentValue();

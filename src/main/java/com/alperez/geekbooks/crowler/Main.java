@@ -62,7 +62,8 @@ public class Main {
             Class.forName("org.sqlite.JDBC");
             BookDbSaver saver = new BookDbSaver(argDestDbName);
             //saver.dropAllTables();
-            saver.createTables();
+            //saver.createTables();
+            saver.initAllTables();
             for (BookModel b : books) {
                 try {
                     saver.insertBook(b);

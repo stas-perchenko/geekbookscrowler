@@ -44,6 +44,36 @@ public final class BookDbSaver implements Closeable {
         }
     }
 
+    private void initTable(DbTableManager tableManager) throws SQLException {
+        if (tableManager.isTableExist()) {
+            tableManager.dropTable();
+        }
+        tableManager.createTable();
+    }
+
+    public void initAllTables() throws SQLException {
+        if (isClosed()) throw new IllegalStateException("Already closed");
+
+        synchronized (mConnection) {
+            try {
+                mConnection.setAutoCommit(false);
+                initTable(new BooksDAO(mConnection));
+                initTable(new AuthorsDAO(mConnection));
+                initTable(new TagsDAO(mConnection));
+                initTable(new CategoriesDAO(mConnection));
+                initTable(new BookAuthorsReferenceDAO(mConnection));
+                initTable(new BookTagsReferenceDAO(mConnection));
+                initTable(new BookRelationsDAO(mConnection));
+                mConnection.commit();
+            } catch (SQLException e) {
+                mConnection.rollback();
+                throw e;
+            } finally {
+                mConnection.setAutoCommit(true);
+            }
+        }
+    }
+
     public void dropAllTables() throws SQLException {
         if (isClosed()) throw new IllegalStateException("Already closed");
 
@@ -131,7 +161,7 @@ public final class BookDbSaver implements Closeable {
                 try {
                     bookAuthDao.insertRelation(book.id(), auth.id(), order++);
                 } catch (SQLException e) {
-                    Log.d(LOG_TAG, "<~~~ Error insert Book-Author relation (%s : %s) - %s", book, auth, e.getMessage());
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-Author relation (%s : %s) - %s", book.title(), auth, e.getMessage());
                     e.printStackTrace(System.out);
                 }
             }
@@ -157,7 +187,7 @@ public final class BookDbSaver implements Closeable {
                 try {
                     bookTagDao.insertRelation(book.id(), tagId, order++);
                 } catch (SQLException e) {
-                    Log.d(LOG_TAG, "<~~~ Error insert Book-Tag relation (%s : %s) - %s", book, tag.title(), e.getMessage());
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-Tag relation (%s : %s) - %s", book.title(), tag.title(), e.getMessage());
                     e.printStackTrace(System.out);
                 }
             }
@@ -185,7 +215,7 @@ public final class BookDbSaver implements Closeable {
                 try {
                     bookRelDao.insertBookRelation(book, relId, order++);
                 } catch (SQLException e) {
-                    Log.d(LOG_TAG, "<~~~ Error insert Book-to-Book relation (%s : %s) - %s", book, relId, e.getMessage());
+                    Log.d(LOG_TAG, "<~~~ Error insert Book-to-Book relation (%s : %s) - %s", book.title(), relId, e.getMessage());
                     throw e;
                 }
             }
@@ -193,8 +223,9 @@ public final class BookDbSaver implements Closeable {
             //----  Save Book entity  ----
             try {
                 bookDao.createOrUpdateBook(book);
+                Log.d(LOG_TAG, "<--- New book has been inserted - \"%s\";", book.title());
             } catch (SQLException e) {
-                Log.d(LOG_TAG, "<~~~ Error insert Book entity %s - %s", book, e.getMessage());
+                Log.d(LOG_TAG, "<~~~ Error insert Book entity %s - %s", book.title(), e.getMessage());
                 throw e;
             }
         }

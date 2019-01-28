@@ -1,5 +1,7 @@
 package com.alperez.geekbooks.crowler.storage.executor;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import java.util.*;
 
 public final class ContentValue {
@@ -25,13 +27,14 @@ public final class ContentValue {
     }
 
     public void put(String key, Object o) {
-        if (data.put(key, o) == null) {
-            keys.add(key);
-        }
+        put(key, o.toString());
     }
 
     public void put(String key, String s) {
-        put(key, (Object) s);
+        String esc_s = s.replaceAll("'", "''");
+        if (data.put(key, esc_s) == null) {
+            keys.add(key);
+        }
     }
 
     public void put(String key, int i) {

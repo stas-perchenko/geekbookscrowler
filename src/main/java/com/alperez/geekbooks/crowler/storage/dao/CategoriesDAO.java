@@ -1,13 +1,14 @@
 package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.dbmodel.BookCategoryModel;
+import com.alperez.geekbooks.crowler.storage.DbTableManager;
 import com.alperez.geekbooks.crowler.storage.executor.ContentValue;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class CategoriesDAO {
+public class CategoriesDAO implements DbTableManager {
     private static final String TABLE_NAME = "Categories";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_LEVEL = "level";
@@ -23,6 +24,7 @@ public class CategoriesDAO {
         executor = new DbExecutor(connection);
     }
 
+    @Override
     public void createTable() throws SQLException {
         String sql = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY, %s INTEGER, %s TEXT, %s INTEGER);",
                 TABLE_NAME,
@@ -30,11 +32,17 @@ public class CategoriesDAO {
                 COLUMN_LEVEL,
                 COLUMN_TITLE,
                 COLUMN_PARENT_ID);
-        executor.execUpdate(sql);
+        executor.execUpdateNumAffected(sql);
     }
 
+    @Override
     public void dropTable() throws SQLException {
-        executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+        executor.execUpdateNumAffected(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    @Override
+    public boolean isTableExist() throws SQLException {
+        return executor.isTableExist(TABLE_NAME);
     }
 
     public void insertCategory(BookCategoryModel category) throws SQLException {

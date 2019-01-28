@@ -2,12 +2,13 @@ package com.alperez.geekbooks.crowler.storage.dao;
 
 import com.alperez.geekbooks.crowler.data.LongId;
 import com.alperez.geekbooks.crowler.data.dbmodel.BookModel;
+import com.alperez.geekbooks.crowler.storage.DbTableManager;
 import com.alperez.geekbooks.crowler.storage.executor.DbExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class BookRelationsDAO {
+public class BookRelationsDAO implements DbTableManager {
     private static final String TABLE_NAME = "BookRelations";
     private static final String COLUMN_HOST_BOOK_ID   = "host_book_id";
     private static final String COLUMN_DEPEND_BOOK_ID = "depend_book_id";
@@ -19,22 +20,29 @@ public class BookRelationsDAO {
         executor = new DbExecutor(connection);
     }
 
+    @Override
     public void createTable() throws SQLException {
         String sql = String.format("CREATE TABLE %1$s (%2$s INTEGER, %3$s INTEGER, %4$s INTEGER, PRIMARY KEY(%2$s, %3$s));",
                 TABLE_NAME,
                 COLUMN_HOST_BOOK_ID,
                 COLUMN_DEPEND_BOOK_ID,
                 COLUMN_ORDER);
-        executor.execUpdate(sql);
+        executor.execUpdateNumAffected(sql);
     }
 
+    @Override
     public void dropTable() throws SQLException {
-        executor.execUpdate(String.format("drop table %s;", TABLE_NAME));
+        executor.execUpdateNumAffected(String.format("drop table %s;", TABLE_NAME));
+    }
+
+    @Override
+    public boolean isTableExist() throws SQLException {
+        return executor.isTableExist(TABLE_NAME);
     }
 
     public int removeReferencesForBooks(LongId<BookModel> bookId) throws SQLException {
         String sql = String.format("DELETE FROM %s WHERE (%s = %d);", TABLE_NAME, COLUMN_HOST_BOOK_ID, bookId.getValue());
-        return executor.execUpdate(sql);
+        return executor.execUpdateNumAffected(sql);
     }
 
     public void insertBookRelation(BookModel hostBook, LongId<BookModel> dependBookId, int order) throws SQLException {
@@ -48,7 +56,7 @@ public class BookRelationsDAO {
                     COLUMN_HOST_BOOK_ID, hostBook.id().getValue(),
                     COLUMN_DEPEND_BOOK_ID, dependBookId.getValue(),
                     COLUMN_ORDER, order);
-            executor.execUpdate(sql);
+            executor.execUpdateNumAffected(sql);
         }
     }
 }
