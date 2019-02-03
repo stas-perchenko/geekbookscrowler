@@ -7,7 +7,9 @@ import com.alperez.geekbooks.crowler.utils.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -33,6 +35,8 @@ public class CategoryItemProcessor implements Runnable {
     private final CategoryItemProvider src;
     private final OnBookFoundListener dst;
 
+    private final List<Log.LogEntry> mLogs = new LinkedList<>();
+
     private final String TAG;
 
     public CategoryItemProcessor(URL urlHost, @NonNull CategoryItemProvider src, @NonNull OnBookFoundListener cb) {
@@ -48,6 +52,8 @@ public class CategoryItemProcessor implements Runnable {
         CategoryItem runItem;
         while ((runItem = src.getCategoryItem()) != null) {
             Collection<BookRefItem> foundRefs = evaluateCategoryItem(runItem);
+            Log.d(mLogs);
+            mLogs.clear();
             dst.onBookFound(foundRefs);
         }
     }
@@ -58,6 +64,8 @@ public class CategoryItemProcessor implements Runnable {
         int nBooksFound = 0;
         int nPage = 1;
         do {
+            String title = String.format("\"%s\", page %d", runItem.getTitle(), nPage);
+            mLogs.add(new Log.LogEntry(TAG, "\n--->  Start processing "+title));
             String pageHtml = loadCategoryPage(runItem, nPage);
 
             if (pageHtml != null) {
@@ -65,12 +73,12 @@ public class CategoryItemProcessor implements Runnable {
                     Collection<BookRefItem> pageRefs = decodeBooksPage(pageHtml);
                     allRefs.addAll(pageRefs);
                     nBooksFound += pageRefs.size();
-                    //TODO Log success - Log.d(TAG, String.format("<--- %d book references has been found for %s page %d", pageRefs.size(), runItem.getTitle(), nPage));
+                    mLogs.add(new Log.LogEntry(TAG, String.format("<--- %d book references has been found for %s page %d", pageRefs.size(), runItem.getTitle(), nPage)));
                 } catch (IOException e) {
-                    //TODO Log Error
-                    e.printStackTrace(System.out);
-                    e.printStackTrace(System.err);
+                    mLogs.add(new Log.LogEntry(TAG, e));
                 }
+            } else {
+                mLogs.add(new Log.LogEntry(TAG, "<~~~ Error load HTML data of the "+title));
             }
 
         } while ((nBooksFound < runItem.getNBooks()) & (nPage++ < 50));
@@ -81,15 +89,11 @@ public class CategoryItemProcessor implements Runnable {
     private String loadCategoryPage(CategoryItem category, int nPage) {
         try {
             URL pageUrl = new URL(String.format("%s?p=%d", category.getUrl(), nPage));
-            //TODO log start - Log.d("\n"+TAG, String.format("---> Start loading books page %d for %s - %s", nPage, category.getTitle(), pageUrl));
 
             String html = (new HtmlPageLoader(pageUrl)).load(1000000);
-            //TODO log end - Log.d(TAG, String.format("<--- Books page %d has been loaded. Size=%d", nPage, pageHtml.length()));
             return html;
         } catch (IOException e) {
-            //TODO Log error
-            e.printStackTrace(System.out);
-            e.printStackTrace(System.err);
+            mLogs.add(new Log.LogEntry(TAG, e));
             return null;
         }
     }
@@ -105,23 +109,16 @@ public class CategoryItemProcessor implements Runnable {
         int index = html.indexOf(BOOKS_PAGE_CONTENT_TAG);
         if (index < 0) {
             throw new IOException(String.format("Bad page content. The %s is not found.", BOOKS_PAGE_CONTENT_TAG));
-            //Log.d(Thread.currentThread().getName(), "Bad page content. The %s is not found.", BOOKS_PAGE_CONTENT_TAG);
-            //return;
         }
 
         String content = new XmlTagExtractor(html).getTag("table", index);
         if (content == null) {
             throw new IOException(String.format("Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG));
-            //Log.d(Thread.currentThread().getName(), "Error extract %s content from the initial HTML page", BOOKS_PAGE_CONTENT_TAG);
-            //return;
-        } else {
-            Log.d(Thread.currentThread().getName(), "<--- HTML content extracted. Size = "+content.length());
         }
 
-        JSONObject jPage = null;
+        JSONObject jPage;
         try {
             jPage = org.json.XML.toJSONObject(content, false);
-            Log.d(TAG, "<--- HTML content was successfully converted to JSON - "+jPage);
         } catch (JSONException e) {
             throw new IOException("cannot convert HTML content to JSON - "+e.getMessage(), e);
         }

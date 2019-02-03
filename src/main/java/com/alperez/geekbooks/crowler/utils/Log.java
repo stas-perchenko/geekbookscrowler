@@ -1,5 +1,7 @@
 package com.alperez.geekbooks.crowler.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Collection;
 
 public class Log {
@@ -37,6 +39,14 @@ public class Log {
         public LogEntry(String tag, String message) {
             this.tag = tag;
             this.message = message;
+        }
+
+        public LogEntry(String tag, Exception e) {
+            this.tag = tag;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
+            PrintStream ps = new PrintStream(bos, true);
+            e.printStackTrace(ps);
+            this.message = bos.toString();
         }
 
         @Override
